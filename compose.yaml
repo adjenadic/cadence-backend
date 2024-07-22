@@ -1,0 +1,34 @@
+services:
+  postgres:
+    image: 'postgres:latest'
+    container_name: postgres
+    ports:
+      - '5432:5432'
+    environment:
+      - 'POSTGRES_DB=cadence_db'
+      - 'POSTGRES_USER=postgres'
+      - 'POSTGRES_PASSWORD=secret'
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d cadence_db" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    ports:
+      - "8000:8000"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/cadence_db?currentSchema=user_service_schema
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - backend
+
+networks:
+  backend:
+    name: cadence-backend-network
