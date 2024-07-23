@@ -16,23 +16,12 @@
     <name>user-service</name>
     <description>Cadence: User Service</description>
 
-    <url/>
-    <licenses>
-        <license/>
-    </licenses>
-    <developers>
-        <developer/>
-    </developers>
-    <scm>
-        <connection/>
-        <developerConnection/>
-        <tag/>
-        <url/>
-    </scm>
-
     <properties>
         <java.version>17</java.version>
+        <revision>${project.version}</revision>
+        <finalName>${project.artifactId}-${revision}</finalName>
     </properties>
+
     <dependencies>
         <!-- Starters -->
         <dependency>
@@ -144,18 +133,6 @@
             <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
 
-        <!-- Scheduling -->
-        <dependency>
-            <groupId>net.javacrumbs.shedlock</groupId>
-            <artifactId>shedlock-spring</artifactId>
-            <version>5.10.0</version>
-        </dependency>
-        <dependency>
-            <groupId>net.javacrumbs.shedlock</groupId>
-            <artifactId>shedlock-provider-jdbc-template</artifactId>
-            <version>5.10.0</version>
-        </dependency>
-
         <!-- Other -->
         <dependency>
             <groupId>javax.xml.bind</groupId>
@@ -166,7 +143,6 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -191,15 +167,14 @@
                 <version>0.8.10</version>
                 <configuration>
                     <excludes>
-                        <!--                        <exclude>**/bootstrap/**</exclude>-->
-                        <!--                        <exclude>**/configuration/**</exclude>-->
-                        <!--                        <exclude>**/data/**</exclude>-->
-                        <!--                        <exclude>**/exceptions/**</exclude>-->
-                        <!--                        <exclude>**/filters/**</exclude>-->
-                        <!--                        <exclude>**/jwtUtils/**</exclude>-->
-                        <!--                        <exclude>**/mapper/**</exclude>-->
-                        <!--                        <exclude>**/repositories/**</exclude>-->
-                        <!--                        <exclude>**/utils/**</exclude>-->
+                        <exclude>**/bootstrap/**</exclude>
+                        <exclude>**/configuration/**</exclude>
+                        <exclude>**/data/**</exclude>
+                        <exclude>**/exceptions/**</exclude>
+                        <exclude>**/filters/**</exclude>
+                        <exclude>**/mappers/**</exclude>
+                        <exclude>**/repositories/**</exclude>
+                        <exclude>**/utils/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>

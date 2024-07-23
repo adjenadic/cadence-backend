@@ -4,6 +4,8 @@ services:
     container_name: postgres
     ports:
       - '5432:5432'
+    volumes:
+      - ./init-db:/docker-entrypoint-initdb.d
     environment:
       - 'POSTGRES_DB=cadence_db'
       - 'POSTGRES_USER=postgres'
@@ -20,9 +22,9 @@ services:
     build: ./user-service
     container_name: user-service
     ports:
-      - "8000:8000"
+      - '8000:8000'
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/cadence_db?currentSchema=user_service_schema
+      - 'SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/cadence_db'
     depends_on:
       postgres:
         condition: service_healthy
