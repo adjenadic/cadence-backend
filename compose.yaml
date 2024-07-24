@@ -5,7 +5,7 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - ./init-db:/docker-entrypoint-initdb.d
+      - ./init-db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     environment:
       - 'POSTGRES_DB=cadence_db'
       - 'POSTGRES_USER=postgres'
@@ -24,7 +24,8 @@ services:
     ports:
       - '8000:8000'
     environment:
-      - 'SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/cadence_db'
+      - 'SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/cadence_db?currentSchema=user_service_schema'
+      - 'SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop'
     depends_on:
       postgres:
         condition: service_healthy

@@ -11,7 +11,7 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
+public class ResponseUserDto {
     private Long id;
     private String email;
     private String username;

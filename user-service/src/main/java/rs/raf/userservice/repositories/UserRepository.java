@@ -18,7 +18,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @param id the unique identifier of the user
      * @return an Optional containing the found user, or an empty Optional if no user was found with the provided id
      */
-    Optional<User> findById(Long id);
+    Optional<User> findUserById(Long id);
 
     /**
      * Retrieves an optional user by their email.
@@ -26,7 +26,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @param email the email of the user
      * @return an Optional containing the found user, or an empty Optional if no user was found with the provided email
      */
-    Optional<User> findByEmail(String email);
+    Optional<User> findUserByEmail(String email);
 
     /**
      * Retrieves an optional user by their username.
@@ -34,5 +34,19 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @param username the username of the user
      * @return an Optional containing the found user, or an empty Optional if no user was found with the provided username
      */
-    Optional<User> findByUsername(String username);
+    Optional<User> findUserByUsername(String username);
+
+    /**
+     * Deletes an entity by their unique identifier.
+     *
+     * @param id the unique identifier of the user
+     */
+    void deleteById(Long id);
+
+    /**
+     * Deletes an entity by their email.
+     *
+     * @param email the email of the user
+     */
+    void deleteByEmail(String email);
 }

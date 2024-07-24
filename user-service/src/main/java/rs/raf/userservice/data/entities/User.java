@@ -18,13 +18,9 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String email;
-
     private String username;
-
     private String password;
-
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_permissions",
@@ -33,9 +29,8 @@ public class User {
     )
     private Set<Permission> permissions = new HashSet<>();
 
-    public User(String email, String username, Set<Permission> permissions) {
+    public User(String email, String username) {
         this.email = email;
         this.username = username;
-        this.permissions = permissions;
     }
 }
