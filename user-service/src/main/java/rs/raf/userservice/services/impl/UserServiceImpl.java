@@ -8,7 +8,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import rs.raf.userservice.data.dtos.CreateRequestUserDto;
+import rs.raf.userservice.data.dtos.RequestCreateUserDto;
+import rs.raf.userservice.data.dtos.RequestUpdateUsernameDto;
 import rs.raf.userservice.data.dtos.ResponseUserDto;
 import rs.raf.userservice.data.entities.User;
 import rs.raf.userservice.mappers.UserMapper;
@@ -81,8 +82,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseUserDto createUser(CreateRequestUserDto createRequestUserDto) {
-        User user = userMapper.createRequestUserDtoToUser(createRequestUserDto);
+    public ResponseUserDto createUser(RequestCreateUserDto requestCreateUserDto) {
+        User user = userMapper.createRequestUserDtoToUser(requestCreateUserDto);
         User savedUser = userRepository.save(user);
 
         user.setPermissions(Set.of());
@@ -92,8 +93,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseUserDto updateUser(ResponseUserDto user) {
-        return null;
+    public ResponseUserDto updateUsername(RequestUpdateUsernameDto requestUpdateUsernameDto) {
+        Optional<User> user = userRepository.findUserByEmail(requestUpdateUsernameDto.getEmail());
+        if (user.isPresent()) {
+            User updatedUser = user.get();
+            updatedUser.setUsername(requestUpdateUsernameDto.getUsername());
+            userRepository.save(updatedUser);
+
+            return userMapper.userToResponseUserDto(updatedUser);
+        } else {
+            throw new UsernameNotFoundException("User not found with email: " + requestUpdateUsernameDto.getEmail());
+        }
     }
 
     @Override
@@ -102,7 +112,7 @@ public class UserServiceImpl implements UserService {
             userRepository.deleteById(id);
             return true;
         } else {
-            throw new RuntimeException("User not found: " + id);
+            throw new RuntimeException("User not found with id: " + id);
         }
     }
 
@@ -113,7 +123,7 @@ public class UserServiceImpl implements UserService {
             userRepository.deleteByEmail(email);
             return true;
         } else {
-            throw new RuntimeException("User not found: " + email);
+            throw new UsernameNotFoundException("User not found with email: " + email);
         }
     }
 }

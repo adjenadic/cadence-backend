@@ -1,7 +1,7 @@
 package rs.raf.userservice.mappers;
 
 import org.springframework.stereotype.Component;
-import rs.raf.userservice.data.dtos.CreateRequestUserDto;
+import rs.raf.userservice.data.dtos.RequestCreateUserDto;
 import rs.raf.userservice.data.dtos.ResponseUserDto;
 import rs.raf.userservice.data.entities.Permission;
 import rs.raf.userservice.data.entities.User;
@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class UserMapper {
-    public User createRequestUserDtoToUser(CreateRequestUserDto dto) {
+    public User createRequestUserDtoToUser(RequestCreateUserDto dto) {
         return new User(
                 dto.getEmail(),
                 dto.getUsername()
