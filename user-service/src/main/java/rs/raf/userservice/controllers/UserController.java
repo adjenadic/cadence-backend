@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import rs.raf.userservice.data.dtos.RequestCreateUserDto;
+import rs.raf.userservice.data.dtos.RequestUpdatePasswordDto;
 import rs.raf.userservice.data.dtos.RequestUpdateUsernameDto;
 import rs.raf.userservice.data.dtos.ResponseUserDto;
 import rs.raf.userservice.services.UserService;
@@ -68,7 +69,17 @@ public class UserController {
             ResponseUserDto responseUserDto = userService.updateUsername(requestUpdateUsernameDto);
             return ResponseEntity.ok(responseUserDto);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    @PutMapping(value = "/update/password")
+    public ResponseEntity<?> updatePassword(@RequestBody RequestUpdatePasswordDto requestUpdatePasswordDto) {
+        try {
+            ResponseUserDto responseUserDto = userService.updatePassword(requestUpdatePasswordDto);
+            return ResponseEntity.ok(responseUserDto);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 

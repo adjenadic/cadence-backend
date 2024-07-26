@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import rs.raf.userservice.data.dtos.RequestCreateUserDto;
+import rs.raf.userservice.data.dtos.RequestUpdatePasswordDto;
 import rs.raf.userservice.data.dtos.RequestUpdateUsernameDto;
 import rs.raf.userservice.data.dtos.ResponseUserDto;
 import rs.raf.userservice.data.entities.User;
@@ -18,7 +19,6 @@ import rs.raf.userservice.services.UserService;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -84,10 +84,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseUserDto createUser(RequestCreateUserDto requestCreateUserDto) {
         User user = userMapper.createRequestUserDtoToUser(requestCreateUserDto);
-        User savedUser = userRepository.save(user);
 
         user.setPermissions(Set.of());
-        user.setPassword(passwordEncoder.encode(Thread.currentThread().getName() + new Random().nextLong() + Thread.activeCount()));
+        user.setPassword(passwordEncoder.encode(requestCreateUserDto.getPassword()));
+
+        User savedUser = userRepository.save(user);
 
         return userMapper.userToResponseUserDto(savedUser);
     }
@@ -103,6 +104,20 @@ public class UserServiceImpl implements UserService {
             return userMapper.userToResponseUserDto(updatedUser);
         } else {
             throw new UsernameNotFoundException("User not found with email: " + requestUpdateUsernameDto.getEmail());
+        }
+    }
+
+    @Override
+    public ResponseUserDto updatePassword(RequestUpdatePasswordDto requestUpdatePasswordDto) {
+        Optional<User> user = userRepository.findUserByEmail(requestUpdatePasswordDto.getPassword());
+        if (user.isPresent()) {
+            User updatedUser = user.get();
+            updatedUser.setPassword(passwordEncoder.encode(requestUpdatePasswordDto.getPassword()));
+            userRepository.save(updatedUser);
+
+            return userMapper.userToResponseUserDto(updatedUser);
+        } else {
+            throw new UsernameNotFoundException("User not found with email: " + requestUpdatePasswordDto.getEmail());
         }
     }
 

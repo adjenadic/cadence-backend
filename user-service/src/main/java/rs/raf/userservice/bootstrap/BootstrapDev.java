@@ -2,6 +2,7 @@ package rs.raf.userservice.bootstrap;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import rs.raf.userservice.data.entities.Permission;
 import rs.raf.userservice.data.entities.User;
@@ -15,6 +16,7 @@ import java.util.Set;
 @Component
 @RequiredArgsConstructor
 public class BootstrapDev implements CommandLineRunner {
+    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final PermissionRepository permissionRepository;
 
@@ -33,7 +35,7 @@ public class BootstrapDev implements CommandLineRunner {
         User user = new User();
         user.setEmail("user@example.com");
         user.setUsername("username");
-        user.setPassword("password");
+        user.setPassword(passwordEncoder.encode("password"));
         user.setPermissions(permissions);
 
         userRepository.save(user);
