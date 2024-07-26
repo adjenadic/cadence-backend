@@ -8,12 +8,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import rs.raf.userservice.data.dtos.RequestCreateUserDto;
-import rs.raf.userservice.data.dtos.RequestUpdatePasswordDto;
-import rs.raf.userservice.data.dtos.RequestUpdateUsernameDto;
-import rs.raf.userservice.data.dtos.ResponseUserDto;
+import rs.raf.userservice.data.dtos.*;
+import rs.raf.userservice.data.entities.Permission;
 import rs.raf.userservice.data.entities.User;
+import rs.raf.userservice.data.enums.PermissionType;
 import rs.raf.userservice.mappers.UserMapper;
+import rs.raf.userservice.repositories.PermissionRepository;
 import rs.raf.userservice.repositories.UserRepository;
 import rs.raf.userservice.services.UserService;
 
@@ -26,14 +26,16 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final ObjectMapper objectMapper;
-    private final UserRepository userRepository;
-    private final UserMapper userMapper;
     private final RabbitTemplate rabbitTemplate;
+    private final UserRepository userRepository;
+    private final PermissionRepository permissionRepository;
+    private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, RabbitTemplate rabbitTemplate, ObjectMapper objectMapper, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, PermissionRepository permissionRepository, UserMapper userMapper, RabbitTemplate rabbitTemplate, ObjectMapper objectMapper, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.permissionRepository = permissionRepository;
         this.userMapper = userMapper;
         this.rabbitTemplate = rabbitTemplate;
         this.objectMapper = objectMapper;
@@ -103,21 +105,49 @@ public class UserServiceImpl implements UserService {
 
             return userMapper.userToResponseUserDto(updatedUser);
         } else {
-            throw new UsernameNotFoundException("User not found with email: " + requestUpdateUsernameDto.getEmail());
+            throw new UsernameNotFoundException(requestUpdateUsernameDto.getEmail());
         }
     }
 
     @Override
     public ResponseUserDto updatePassword(RequestUpdatePasswordDto requestUpdatePasswordDto) {
-        Optional<User> user = userRepository.findUserByEmail(requestUpdatePasswordDto.getPassword());
+        Optional<User> user = userRepository.findUserByEmail(requestUpdatePasswordDto.getEmail());
         if (user.isPresent()) {
             User updatedUser = user.get();
-            updatedUser.setPassword(passwordEncoder.encode(requestUpdatePasswordDto.getPassword()));
+
+            if (!passwordEncoder.matches(requestUpdatePasswordDto.getCurrentPassword(), updatedUser.getPassword())) {
+                throw new IllegalArgumentException("The inputted current password is incorrect.");
+            }
+
+            if (!requestUpdatePasswordDto.getUpdatedPassword().equals(requestUpdatePasswordDto.getUpdatedPasswordConfirmation())) {
+                throw new IllegalArgumentException("The inputted passwords do not match.");
+            }
+
+            updatedUser.setPassword(passwordEncoder.encode(requestUpdatePasswordDto.getUpdatedPassword()));
             userRepository.save(updatedUser);
 
             return userMapper.userToResponseUserDto(updatedUser);
         } else {
-            throw new UsernameNotFoundException("User not found with email: " + requestUpdatePasswordDto.getEmail());
+            throw new UsernameNotFoundException("User with email " + requestUpdatePasswordDto.getEmail() + " not found.");
+        }
+    }
+
+    @Override
+    public ResponseUserDto updatePermissions(RequestUpdatePermissionsDto requestUpdatePermissionsDto) {
+        Optional<User> user = userRepository.findUserByEmail(requestUpdatePermissionsDto.getEmail());
+        if (user.isPresent()) {
+            User updatedUser = user.get();
+            Set<Permission> permissions = requestUpdatePermissionsDto.getPermissions().stream()
+                    .map(PermissionType::valueOf)
+                    .map(permissionRepository::findPermissionByPermissionType)
+                    .flatMap(Optional::stream)
+                    .collect(Collectors.toSet());
+            updatedUser.setPermissions(permissions);
+            userRepository.save(updatedUser);
+
+            return userMapper.userToResponseUserDto(updatedUser);
+        } else {
+            throw new UsernameNotFoundException("User not found with email: " + requestUpdatePermissionsDto.getEmail());
         }
     }
 

@@ -4,12 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import rs.raf.userservice.data.dtos.RequestCreateUserDto;
-import rs.raf.userservice.data.dtos.RequestUpdatePasswordDto;
-import rs.raf.userservice.data.dtos.RequestUpdateUsernameDto;
-import rs.raf.userservice.data.dtos.ResponseUserDto;
+import rs.raf.userservice.data.dtos.*;
 import rs.raf.userservice.services.UserService;
 import rs.raf.userservice.utils.JwtUtil;
 
@@ -68,8 +66,10 @@ public class UserController {
         try {
             ResponseUserDto responseUserDto = userService.updateUsername(requestUpdateUsernameDto);
             return ResponseEntity.ok(responseUserDto);
-        } catch (Exception e) {
+        } catch (UsernameNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
@@ -78,8 +78,22 @@ public class UserController {
         try {
             ResponseUserDto responseUserDto = userService.updatePassword(requestUpdatePasswordDto);
             return ResponseEntity.ok(responseUserDto);
-        } catch (Exception e) {
+        } catch (UsernameNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PutMapping(value = "/update/permissions")
+    public ResponseEntity<?> updateUserPermissions(@RequestBody RequestUpdatePermissionsDto requestUpdatePermissionsDto) {
+        try {
+            ResponseUserDto responseUserDto = userService.updatePermissions(requestUpdatePermissionsDto);
+            return ResponseEntity.ok(responseUserDto);
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 

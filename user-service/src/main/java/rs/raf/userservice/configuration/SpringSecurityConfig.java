@@ -23,19 +23,19 @@ import rs.raf.userservice.services.UserService;
 public class SpringSecurityConfig {
     private final UserService userService;
     private final JwtFilter jwtFilter;
-    private final PasswordEncoder bCryptPasswordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    public SpringSecurityConfig(UserService userService, JwtFilter jwtFilter, PasswordEncoder bCryptPasswordEncoder) {
+    public SpringSecurityConfig(UserService userService, JwtFilter jwtFilter, PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.jwtFilter = jwtFilter;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(this.userService);
-        authProvider.setPasswordEncoder(this.bCryptPasswordEncoder);
+        authProvider.setUserDetailsService(userService);
+        authProvider.setPasswordEncoder(passwordEncoder);
         return authProvider;
     }
 
@@ -44,14 +44,13 @@ public class SpringSecurityConfig {
         http
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(
-                        requests -> requests
-                                .requestMatchers(new AntPathRequestMatcher("/v3/api-docs/**")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/swagger-ui/**")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/api/auth/**")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/api/users/**")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/api/permissions/**")).hasAnyRole("PERM_1")
-                                .anyRequest().permitAll()
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(new AntPathRequestMatcher("/v3/api-docs/**")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/swagger-ui/**")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api/auth/**")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api/users/**")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api/permissions/**")).hasRole("PERMISSION_1")
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

@@ -2,10 +2,7 @@ package rs.raf.userservice.services;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
-import rs.raf.userservice.data.dtos.RequestCreateUserDto;
-import rs.raf.userservice.data.dtos.RequestUpdatePasswordDto;
-import rs.raf.userservice.data.dtos.RequestUpdateUsernameDto;
-import rs.raf.userservice.data.dtos.ResponseUserDto;
+import rs.raf.userservice.data.dtos.*;
 
 import java.util.List;
 
@@ -24,6 +21,8 @@ public interface UserService extends UserDetailsService {
     ResponseUserDto updateUsername(RequestUpdateUsernameDto requestUpdateUsernameDto);
 
     ResponseUserDto updatePassword(RequestUpdatePasswordDto requestUpdatePasswordDto);
+
+    ResponseUserDto updatePermissions(RequestUpdatePermissionsDto requestUpdatePermissionsDto);
 
     boolean deleteUserById(Long id);
 

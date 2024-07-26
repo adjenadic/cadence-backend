@@ -4,12 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RequestUpdatePasswordDto {
+public class RequestUpdatePermissionsDto {
     private String email;
-    private String currentPassword;
-    private String updatedPassword;
-    private String updatedPasswordConfirmation;
+    private List<String> permissions;
 }

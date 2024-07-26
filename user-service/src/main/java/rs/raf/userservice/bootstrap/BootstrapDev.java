@@ -28,16 +28,22 @@ public class BootstrapDev implements CommandLineRunner {
         permission1 = permissionRepository.save(permission1);
         permission2 = permissionRepository.save(permission2);
 
-        Set<Permission> permissions = new HashSet<>();
-        permissions.add(permission1);
-        permissions.add(permission2);
+        Set<Permission> adminPermissions = new HashSet<>();
+        adminPermissions.add(permission1);
+        adminPermissions.add(permission2);
+
+        User admin = new User();
+        admin.setEmail("admin@cadence.com");
+        admin.setUsername("admin");
+        admin.setPassword(passwordEncoder.encode("admin"));
+        admin.setPermissions(adminPermissions);
+        userRepository.save(admin);
 
         User user = new User();
-        user.setEmail("user@example.com");
-        user.setUsername("username");
-        user.setPassword(passwordEncoder.encode("password"));
-        user.setPermissions(permissions);
-
+        user.setEmail("user@cadence.com");
+        user.setUsername("user");
+        user.setPassword(passwordEncoder.encode("user"));
+        user.setPermissions(new HashSet<>());
         userRepository.save(user);
     }
 }
