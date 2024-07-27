@@ -17,9 +17,7 @@ import rs.raf.userservice.repositories.PermissionRepository;
 import rs.raf.userservice.repositories.UserRepository;
 import rs.raf.userservice.services.UserService;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,13 +43,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findUserByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
+                .orElseThrow(() -> new UsernameNotFoundException("User with email " + email + " not found."));
         return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
+                user.getEmail(),
                 user.getPassword(),
-                user.getPermissions().stream()
-                        .map(permission -> new org.springframework.security.core.authority.SimpleGrantedAuthority(permission.getPermissionType().name()))
-                        .collect(Collectors.toList())
+                new ArrayList<>()
         );
     }
 
@@ -137,11 +133,23 @@ public class UserServiceImpl implements UserService {
         Optional<User> user = userRepository.findUserByEmail(requestUpdatePermissionsDto.getEmail());
         if (user.isPresent()) {
             User updatedUser = user.get();
-            Set<Permission> permissions = requestUpdatePermissionsDto.getPermissions().stream()
-                    .map(PermissionType::valueOf)
-                    .map(permissionRepository::findPermissionByPermissionType)
-                    .flatMap(Optional::stream)
-                    .collect(Collectors.toSet());
+
+            Set<Permission> permissions = new HashSet<>();
+            if (requestUpdatePermissionsDto.getPermissions() != null && !requestUpdatePermissionsDto.getPermissions().isEmpty()) {
+                permissions = requestUpdatePermissionsDto.getPermissions().stream()
+                        .map(permissionTypeStr -> {
+                            try {
+                                PermissionType permissionType = PermissionType.valueOf(permissionTypeStr);
+                                return permissionRepository.findPermissionByPermissionType(permissionType)
+                                        .orElse(null);
+                            } catch (IllegalArgumentException e) {
+                                return null;
+                            }
+                        })
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toSet());
+            }
+
             updatedUser.setPermissions(permissions);
             userRepository.save(updatedUser);
 
@@ -151,13 +159,14 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+
     @Override
     public boolean deleteUserById(Long id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
             return true;
         } else {
-            throw new RuntimeException("User not found with id: " + id);
+            throw new RuntimeException("User with id " + id + " not found.");
         }
     }
 
@@ -168,7 +177,7 @@ public class UserServiceImpl implements UserService {
             userRepository.deleteByEmail(email);
             return true;
         } else {
-            throw new UsernameNotFoundException("User not found with email: " + email);
+            throw new UsernameNotFoundException("User with email " + email + " not found.");
         }
     }
 }

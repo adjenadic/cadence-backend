@@ -9,6 +9,7 @@ import rs.raf.userservice.data.dtos.ResponseUserDto;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -31,14 +32,13 @@ public class JwtUtil {
         return extractAllClaims(token).getSubject();
     }
 
-    public String getPermissions(String token) {
-        return extractAllClaims(token).get("permissions", String.class);
+    @SuppressWarnings("unchecked")
+    public List<String> getPermissions(String token) {
+        return extractAllClaims(token).get("permissions", List.class);
     }
 
     public String generateToken(ResponseUserDto responseUserDto) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("id", responseUserDto.getId());
-        claims.put("email", responseUserDto.getEmail());
         claims.put("permissions", responseUserDto.getPermissions());
         return Jwts.builder()
                 .setClaims(claims)

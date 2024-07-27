@@ -15,6 +15,8 @@ import rs.raf.userservice.services.UserService;
 import rs.raf.userservice.utils.JwtUtil;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -30,7 +32,7 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String jwt = null;
         String email = null;
-        String permissions = null;
+        List<String> permissions = new ArrayList<>();
 
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
@@ -40,16 +42,15 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails principal = User.withUserDetails(this.userService.loadUserByUsername(email)).username(email).roles(permissions).build();
-            if (jwtUtil.validateToken(jwt, principal)) {
+            UserDetails userDetails = User.withUserDetails(userService.loadUserByUsername(email)).username(email).authorities(permissions.toArray(new String[0])).build();
+            if (jwtUtil.validateToken(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken
                         usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                        principal,
+                        userDetails,
                         null,
-                        principal.getAuthorities()
+                        userDetails.getAuthorities()
                 );
                 usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
             }
         }

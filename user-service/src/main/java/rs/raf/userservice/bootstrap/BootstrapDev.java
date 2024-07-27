@@ -22,8 +22,8 @@ public class BootstrapDev implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        Permission permission1 = new Permission(PermissionType.PERMISSION_1);
-        Permission permission2 = new Permission(PermissionType.PERMISSION_2);
+        Permission permission1 = new Permission(PermissionType.MANAGE_USERNAMES);
+        Permission permission2 = new Permission(PermissionType.MANAGE_PERMISSIONS);
 
         permission1 = permissionRepository.save(permission1);
         permission2 = permissionRepository.save(permission2);

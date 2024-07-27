@@ -3,8 +3,8 @@ package rs.raf.userservice.data.enums;
 import org.springframework.security.core.GrantedAuthority;
 
 public enum PermissionType implements GrantedAuthority {
-    PERMISSION_1("PERMISSION_1"),
-    PERMISSION_2("PERMISSION_2");
+    MANAGE_USERNAMES("MANAGE_USERNAMES"),
+    MANAGE_PERMISSIONS("MANAGE_PERMISSIONS");
 
     private final String permission;
 

@@ -18,19 +18,19 @@ services:
       timeout: 10s
       retries: 5
 
-  user-service:
-    build: ./user-service
-    container_name: user-service
-    ports:
-      - '8000:8000'
-    environment:
-      - 'SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/cadence_db?currentSchema=user_service_schema'
-      - 'SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop'
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - backend
+#  user-service:
+#    build: ./user-service
+#    container_name: user-service
+#    ports:
+#      - '8000:8000'
+#    environment:
+#      - 'SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/cadence_db?currentSchema=user_service_schema'
+#      - 'SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop'
+#    depends_on:
+#      postgres:
+#        condition: service_healthy
+#    networks:
+#      - backend
 
 networks:
   backend:

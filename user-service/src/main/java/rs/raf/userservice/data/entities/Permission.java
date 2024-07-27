@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Permission {
     @ManyToMany(mappedBy = "permissions")
-    List<User> users;
+    private List<User> users;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
