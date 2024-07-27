@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,10 +13,12 @@ import rs.raf.userservice.data.dtos.*;
 import rs.raf.userservice.data.entities.Permission;
 import rs.raf.userservice.data.entities.User;
 import rs.raf.userservice.data.enums.PermissionType;
+import rs.raf.userservice.exceptions.*;
 import rs.raf.userservice.mappers.UserMapper;
 import rs.raf.userservice.repositories.PermissionRepository;
 import rs.raf.userservice.repositories.UserRepository;
 import rs.raf.userservice.services.UserService;
+import rs.raf.userservice.utils.SpringSecurityUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -43,7 +46,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findUserByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User with email " + email + " not found."));
+                .orElseThrow(() -> new EmailNotFoundException(email));
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),
@@ -62,46 +65,64 @@ public class UserServiceImpl implements UserService {
     public ResponseUserDto findUserById(Long id) {
         return userRepository.findUserById(id)
                 .map(userMapper::userToResponseUserDto)
-                .orElse(null);
+                .orElseThrow(() -> new IdNotFoundException(id));
     }
 
     @Override
     public ResponseUserDto findUserByEmail(String email) {
         return userRepository.findUserByEmail(email)
                 .map(userMapper::userToResponseUserDto)
-                .orElse(null);
+                .orElseThrow(() -> new EmailNotFoundException(email));
     }
 
     @Override
     public ResponseUserDto findUserByUsername(String username) {
         return userRepository.findUserByUsername(username)
                 .map(userMapper::userToResponseUserDto)
-                .orElse(null);
+                .orElseThrow(() -> new AppUsernameNotFoundException(username));
     }
 
     @Override
     public ResponseUserDto createUser(RequestCreateUserDto requestCreateUserDto) {
-        User user = userMapper.createRequestUserDtoToUser(requestCreateUserDto);
+        if (userRepository.findUserByEmail(requestCreateUserDto.getEmail()).isPresent()) {
+            throw new EmailAlreadyTakenException(requestCreateUserDto.getEmail());
+        }
 
+        if (userRepository.findUserByUsername(requestCreateUserDto.getUsername()).isPresent()) {
+            throw new UsernameAlreadyTakenException(requestCreateUserDto.getUsername());
+        }
+
+        User user = userMapper.createRequestUserDtoToUser(requestCreateUserDto);
         user.setPermissions(Set.of());
         user.setPassword(passwordEncoder.encode(requestCreateUserDto.getPassword()));
 
-        User savedUser = userRepository.save(user);
+        User createdUser = userRepository.save(user);
 
-        return userMapper.userToResponseUserDto(savedUser);
+        return userMapper.userToResponseUserDto(createdUser);
     }
 
     @Override
     public ResponseUserDto updateUsername(RequestUpdateUsernameDto requestUpdateUsernameDto) {
-        Optional<User> user = userRepository.findUserByEmail(requestUpdateUsernameDto.getEmail());
-        if (user.isPresent()) {
-            User updatedUser = user.get();
-            updatedUser.setUsername(requestUpdateUsernameDto.getUsername());
-            userRepository.save(updatedUser);
+        if (SpringSecurityUtil.getPrincipalEmail().equals(requestUpdateUsernameDto.getEmail()) ||
+                SpringSecurityUtil.hasPermission("MANAGE_USERNAMES")) {
+            Optional<User> user = userRepository.findUserByEmail(requestUpdateUsernameDto.getEmail());
+            if (user.isPresent()) {
+                User updatedUser = user.get();
 
-            return userMapper.userToResponseUserDto(updatedUser);
+                Optional<User> existingUserWithUsername = userRepository.findUserByUsername(requestUpdateUsernameDto.getUsername());
+                if (existingUserWithUsername.isPresent() && !existingUserWithUsername.get().getEmail().equals(requestUpdateUsernameDto.getEmail())) {
+                    throw new UsernameAlreadyTakenException(requestUpdateUsernameDto.getUsername());
+                }
+
+                updatedUser.setUsername(requestUpdateUsernameDto.getUsername());
+                userRepository.save(updatedUser);
+
+                return userMapper.userToResponseUserDto(updatedUser);
+            } else {
+                throw new EmailNotFoundException(requestUpdateUsernameDto.getEmail());
+            }
         } else {
-            throw new UsernameNotFoundException(requestUpdateUsernameDto.getEmail());
+            throw new AccessDeniedException("You do not have permission to update this username.");
         }
     }
 
@@ -124,7 +145,7 @@ public class UserServiceImpl implements UserService {
 
             return userMapper.userToResponseUserDto(updatedUser);
         } else {
-            throw new UsernameNotFoundException("User with email " + requestUpdatePasswordDto.getEmail() + " not found.");
+            throw new EmailNotFoundException(requestUpdatePasswordDto.getEmail());
         }
     }
 
@@ -155,10 +176,9 @@ public class UserServiceImpl implements UserService {
 
             return userMapper.userToResponseUserDto(updatedUser);
         } else {
-            throw new UsernameNotFoundException("User not found with email: " + requestUpdatePermissionsDto.getEmail());
+            throw new EmailNotFoundException(requestUpdatePermissionsDto.getEmail());
         }
     }
-
 
     @Override
     public boolean deleteUserById(Long id) {
@@ -166,7 +186,7 @@ public class UserServiceImpl implements UserService {
             userRepository.deleteById(id);
             return true;
         } else {
-            throw new RuntimeException("User with id " + id + " not found.");
+            throw new IdNotFoundException(id);
         }
     }
 
@@ -177,7 +197,7 @@ public class UserServiceImpl implements UserService {
             userRepository.deleteByEmail(email);
             return true;
         } else {
-            throw new UsernameNotFoundException("User with email " + email + " not found.");
+            throw new EmailNotFoundException(email);
         }
     }
 }

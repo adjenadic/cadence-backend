@@ -1,11 +1,9 @@
 package rs.raf.userservice.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import rs.raf.userservice.data.dtos.*;
@@ -27,105 +25,55 @@ public class UserController {
 
     @GetMapping(value = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> findUserById(@PathVariable Long id) {
-        ResponseUserDto responseUserDto = userService.findUserById(id);
-        if (responseUserDto == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found with id: " + id);
-        }
-        return ResponseEntity.ok(responseUserDto);
+        return ResponseEntity.ok(userService.findUserById(id));
     }
 
     @GetMapping(value = "/email/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> findUserByEmail(@PathVariable String email) {
-        ResponseUserDto responseUserDto = userService.findUserByEmail(email);
-        if (responseUserDto == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found with email: " + email);
-        }
-        return ResponseEntity.ok(responseUserDto);
+        return ResponseEntity.ok(userService.findUserByEmail(email));
     }
 
     @GetMapping(value = "/username/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> findUserByUsername(@PathVariable String username) {
-        ResponseUserDto responseUserDto = userService.findUserByUsername(username);
-        if (responseUserDto == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found with username: " + username);
-        }
-        return ResponseEntity.ok(responseUserDto);
+        return ResponseEntity.ok(userService.findUserByUsername(username));
     }
 
     @PostMapping(value = "/create")
     public ResponseEntity<?> createUser(@RequestBody RequestCreateUserDto requestCreateUserDto) {
-        try {
-            ResponseUserDto responseUserDto = userService.createUser(requestCreateUserDto);
-            return ResponseEntity.ok(responseUserDto);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+        ResponseUserDto responseUserDto = userService.createUser(requestCreateUserDto);
+        return ResponseEntity.ok(responseUserDto);
     }
 
     @PutMapping(value = "/update/username")
     public ResponseEntity<?> updateUsername(@RequestBody RequestUpdateUsernameDto requestUpdateUsernameDto) {
-        try {
-            ResponseUserDto responseUserDto = userService.updateUsername(requestUpdateUsernameDto);
-            return ResponseEntity.ok(responseUserDto);
-        } catch (UsernameNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+        ResponseUserDto responseUserDto = userService.updateUsername(requestUpdateUsernameDto);
+        return ResponseEntity.ok(responseUserDto);
     }
 
     @PutMapping(value = "/update/password")
     public ResponseEntity<?> updatePassword(@RequestBody RequestUpdatePasswordDto requestUpdatePasswordDto) {
-        try {
-            ResponseUserDto responseUserDto = userService.updatePassword(requestUpdatePasswordDto);
-            return ResponseEntity.ok(responseUserDto);
-        } catch (UsernameNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+        ResponseUserDto responseUserDto = userService.updatePassword(requestUpdatePasswordDto);
+        return ResponseEntity.ok(responseUserDto);
     }
 
     @PutMapping(value = "/update/permissions")
     @PreAuthorize("hasAuthority('MANAGE_PERMISSIONS')")
     public ResponseEntity<?> updatePermissions(@RequestBody RequestUpdatePermissionsDto requestUpdatePermissionsDto) {
-        try {
-            ResponseUserDto responseUserDto = userService.updatePermissions(requestUpdatePermissionsDto);
-            return ResponseEntity.ok(responseUserDto);
-        } catch (UsernameNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+        ResponseUserDto responseUserDto = userService.updatePermissions(requestUpdatePermissionsDto);
+        return ResponseEntity.ok(responseUserDto);
     }
 
     @DeleteMapping(value = "/delete/id/{id}", produces = MediaType.ALL_VALUE)
     @Transactional
     public ResponseEntity<?> deleteUserById(@PathVariable Long id) {
-        try {
-            boolean isUserDeleted = userService.deleteUserById(id);
-            if (isUserDeleted) {
-                return ResponseEntity.ok("User deleted successfully: " + id);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found with id: " + id);
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+        boolean isDeleted = userService.deleteUserById(id);
+        return ResponseEntity.ok(isDeleted);
     }
 
     @DeleteMapping(value = "/delete/email/{email}", produces = MediaType.ALL_VALUE)
     @Transactional
     public ResponseEntity<?> deleteUserByEmail(@PathVariable String email) {
-        try {
-            boolean isUserDeleted = userService.deleteUserByEmail(email);
-            if (isUserDeleted) {
-                return ResponseEntity.ok("User deleted successfully: " + email);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found with email: " + email);
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+        boolean isDeleted = userService.deleteUserByEmail(email);
+        return ResponseEntity.ok(isDeleted);
     }
 }
