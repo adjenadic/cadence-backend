@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import rs.raf.userservice.data.dtos.*;
 import rs.raf.userservice.services.UserService;
-import rs.raf.userservice.utils.JwtUtil;
 
 @RestController
 @CrossOrigin
@@ -16,7 +15,6 @@ import rs.raf.userservice.utils.JwtUtil;
 @RequestMapping(value = "/api/users")
 public class UserController {
     private final UserService userService;
-    private final JwtUtil jwtUtil;
 
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> findAllUsers() {

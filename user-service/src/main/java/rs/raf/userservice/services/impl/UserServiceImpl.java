@@ -182,9 +182,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean deleteUserById(Long id) {
-        if (userRepository.existsById(id)) {
-            userRepository.deleteById(id);
-            return true;
+        Optional<User> user = userRepository.findUserById(id);
+        if (user.isPresent()) {
+            if (SpringSecurityUtil.getPrincipalEmail().equals(user.get().getEmail()) ||
+                    SpringSecurityUtil.hasPermission("DELETE_USERS")) {
+                userRepository.deleteById(id);
+                return true;
+            } else {
+                throw new AccessDeniedException("You do not have permission to delete this user.");
+            }
         } else {
             throw new IdNotFoundException(id);
         }
@@ -194,8 +200,13 @@ public class UserServiceImpl implements UserService {
     public boolean deleteUserByEmail(String email) {
         Optional<User> user = userRepository.findUserByEmail(email);
         if (user.isPresent()) {
-            userRepository.deleteByEmail(email);
-            return true;
+            if (SpringSecurityUtil.getPrincipalEmail().equals(user.get().getEmail()) ||
+                    SpringSecurityUtil.hasPermission("DELETE_USERS")) {
+                userRepository.deleteByEmail(email);
+                return true;
+            } else {
+                throw new AccessDeniedException("You do not have permission to delete this user.");
+            }
         } else {
             throw new EmailNotFoundException(email);
         }
