@@ -32,6 +32,31 @@ services:
 #    networks:
 #      - backend
 
+#  notification-service:
+#    build: ./notification-service
+#    container_name: notification-service
+#    ports:
+#      - '8001:8001'
+#    depends_on:
+#      postgres:
+#        condition: service_healthy
+#    networks:
+#      - backend
+
+#  music-service:
+#    build: ./music-service
+#    container_name: music-service
+#    ports:
+#      - '8002:8002'
+#    environment:
+#      - 'SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/cadence_db?currentSchema=music_service_schema'
+#      - 'SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop'
+#    depends_on:
+#      postgres:
+#        condition: service_healthy
+#    networks:
+#      - backend
+
 networks:
   backend:
     name: cadence-backend-network
