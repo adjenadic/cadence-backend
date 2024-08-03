@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import rs.raf.cadence.userservice.data.enums.PermissionType;
-import rs.raf.cadence.userservice.repositories.UserRepository;
 import rs.raf.cadence.userservice.data.entities.Permission;
 import rs.raf.cadence.userservice.data.entities.User;
+import rs.raf.cadence.userservice.data.enums.PermissionType;
 import rs.raf.cadence.userservice.repositories.PermissionRepository;
+import rs.raf.cadence.userservice.repositories.UserRepository;
 
 import java.util.HashSet;
 import java.util.Set;

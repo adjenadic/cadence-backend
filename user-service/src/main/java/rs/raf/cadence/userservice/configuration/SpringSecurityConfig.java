@@ -13,8 +13,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import rs.raf.cadence.userservice.services.UserService;
 import rs.raf.cadence.userservice.filters.JwtFilter;
+import rs.raf.cadence.userservice.services.UserService;
 
 @Configuration
 @EnableWebSecurity

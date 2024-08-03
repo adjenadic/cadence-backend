@@ -10,13 +10,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import rs.raf.cadence.userservice.data.dtos.*;
-import rs.raf.cadence.userservice.data.enums.PermissionType;
-import rs.raf.cadence.userservice.exceptions.*;
-import rs.raf.cadence.userservice.repositories.UserRepository;
 import rs.raf.cadence.userservice.data.entities.Permission;
 import rs.raf.cadence.userservice.data.entities.User;
+import rs.raf.cadence.userservice.data.enums.PermissionType;
+import rs.raf.cadence.userservice.exceptions.*;
 import rs.raf.cadence.userservice.mappers.UserMapper;
 import rs.raf.cadence.userservice.repositories.PermissionRepository;
+import rs.raf.cadence.userservice.repositories.UserRepository;
 import rs.raf.cadence.userservice.services.UserService;
 import rs.raf.cadence.userservice.utils.SpringSecurityUtil;
 

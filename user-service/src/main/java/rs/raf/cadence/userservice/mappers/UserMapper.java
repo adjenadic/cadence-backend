@@ -1,10 +1,10 @@
 package rs.raf.cadence.userservice.mappers;
 
 import org.springframework.stereotype.Component;
-import rs.raf.cadence.userservice.data.entities.User;
 import rs.raf.cadence.userservice.data.dtos.RequestCreateUserDto;
 import rs.raf.cadence.userservice.data.dtos.ResponseUserDto;
 import rs.raf.cadence.userservice.data.entities.Permission;
+import rs.raf.cadence.userservice.data.entities.User;
 
 import java.util.stream.Collectors;
 
