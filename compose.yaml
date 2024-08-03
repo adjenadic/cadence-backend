@@ -18,6 +18,19 @@ services:
       timeout: 10s
       retries: 5
 
+  mongo:
+    image: 'mongo:latest'
+    container_name: mongo
+    ports:
+      - '27017:27017'
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD-SHELL", "mongo --eval 'db.runCommand({ ping: 1 })'" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
 #  user-service:
 #    build: ./user-service
 #    container_name: user-service
@@ -38,7 +51,7 @@ services:
 #    ports:
 #      - '8001:8001'
 #    depends_on:
-#      postgres:
+#      rabbitmq:
 #        condition: service_healthy
 #    networks:
 #      - backend
@@ -49,10 +62,9 @@ services:
 #    ports:
 #      - '8002:8002'
 #    environment:
-#      - 'SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/cadence_db?currentSchema=music_service_schema'
-#      - 'SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop'
+#      - 'SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/cadence'
 #    depends_on:
-#      postgres:
+#      mongo:
 #        condition: service_healthy
 #    networks:
 #      - backend
