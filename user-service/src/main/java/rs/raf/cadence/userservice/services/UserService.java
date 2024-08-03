@@ -3,7 +3,6 @@ package rs.raf.cadence.userservice.services;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import rs.raf.cadence.userservice.data.dtos.*;
-import rs.raf.userservice.data.dtos.*;
 
 import java.util.List;
 
