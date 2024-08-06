@@ -27,7 +27,7 @@ public class DataImportService {
     }
 
     public void importCsvData() {
-//        importArtists();
+        importArtists();
         importAlbums();
     }
 
