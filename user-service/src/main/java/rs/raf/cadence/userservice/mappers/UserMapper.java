@@ -5,7 +5,9 @@ import rs.raf.cadence.userservice.data.dtos.RequestCreateUserDto;
 import rs.raf.cadence.userservice.data.dtos.ResponseUserDto;
 import rs.raf.cadence.userservice.data.entities.Permission;
 import rs.raf.cadence.userservice.data.entities.User;
+import rs.raf.cadence.userservice.data.enums.PermissionType;
 
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -22,7 +24,16 @@ public class UserMapper {
                 user.getId(),
                 user.getEmail(),
                 user.getUsername(),
-                user.getPermissions().stream().map(Permission::getPermissionType).collect(Collectors.toSet())
+                user.getPronouns(),
+                user.getAboutMe(),
+                user.getProfilePicture(),
+                mapPermissions(user.getPermissions())
         );
+    }
+
+    private Set<PermissionType> mapPermissions(Set<Permission> permissions) {
+        return permissions.stream()
+                .map(Permission::getPermissionType)
+                .collect(Collectors.toSet());
     }
 }

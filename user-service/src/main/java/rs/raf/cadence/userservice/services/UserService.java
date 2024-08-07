@@ -24,6 +24,12 @@ public interface UserService extends UserDetailsService {
 
     ResponseUserDto updatePermissions(RequestUpdatePermissionsDto requestUpdatePermissionsDto);
 
+    ResponseUserDto updatePronouns(RequestUpdatePronounsDto requestUpdatePronounsDto);
+
+    ResponseUserDto updateAboutMe(RequestUpdateAboutMeDto requestUpdateAboutMeDto);
+
+    ResponseUserDto updateProfilePicture(RequestUpdateProfilePictureDto requestUpdateProfilePictureDto);
+
     boolean deleteUserById(Long id);
 
     boolean deleteUserByEmail(String email);

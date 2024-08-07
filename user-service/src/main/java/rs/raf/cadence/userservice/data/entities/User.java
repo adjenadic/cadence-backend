@@ -21,6 +21,9 @@ public class User {
     private String email;
     private String username;
     private String password;
+    private String pronouns;
+    private String aboutMe;
+    private String profilePicture;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_permissions",

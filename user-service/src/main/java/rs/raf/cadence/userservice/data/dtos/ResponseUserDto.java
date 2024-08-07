@@ -15,5 +15,8 @@ public class ResponseUserDto {
     private Long id;
     private String email;
     private String username;
+    private String pronouns;
+    private String aboutMe;
+    private String profilePicture;
     private Set<PermissionType> permissions = new HashSet<>();
 }

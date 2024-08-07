@@ -181,6 +181,66 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public ResponseUserDto updatePronouns(RequestUpdatePronounsDto requestUpdatePronounsDto) {
+        if (SpringSecurityUtil.getPrincipalEmail().equals(requestUpdatePronounsDto.getEmail()) ||
+                SpringSecurityUtil.hasPermission("MANAGE_USER_DETAILS")) {
+            Optional<User> user = userRepository.findUserByEmail(requestUpdatePronounsDto.getEmail());
+            if (user.isPresent()) {
+                User updatedUser = user.get();
+
+                updatedUser.setPronouns(requestUpdatePronounsDto.getPronouns());
+                userRepository.save(updatedUser);
+
+                return userMapper.userToResponseUserDto(updatedUser);
+            } else {
+                throw new EmailNotFoundException(requestUpdatePronounsDto.getEmail());
+            }
+        } else {
+            throw new AccessDeniedException("You do not have permission to update these pronouns.");
+        }
+    }
+
+    @Override
+    public ResponseUserDto updateAboutMe(RequestUpdateAboutMeDto requestUpdateAboutMeDto) {
+        if (SpringSecurityUtil.getPrincipalEmail().equals(requestUpdateAboutMeDto.getEmail()) ||
+                SpringSecurityUtil.hasPermission("MANAGE_USER_DETAILS")) {
+            Optional<User> user = userRepository.findUserByEmail(requestUpdateAboutMeDto.getEmail());
+            if (user.isPresent()) {
+                User updatedUser = user.get();
+
+                updatedUser.setPronouns(requestUpdateAboutMeDto.getAboutMe());
+                userRepository.save(updatedUser);
+
+                return userMapper.userToResponseUserDto(updatedUser);
+            } else {
+                throw new EmailNotFoundException(requestUpdateAboutMeDto.getEmail());
+            }
+        } else {
+            throw new AccessDeniedException("You do not have permission to update this about me section.");
+        }
+    }
+
+    @Override
+    public ResponseUserDto updateProfilePicture(RequestUpdateProfilePictureDto requestUpdateProfilePictureDto) {
+        if (SpringSecurityUtil.getPrincipalEmail().equals(requestUpdateProfilePictureDto.getEmail()) ||
+                SpringSecurityUtil.hasPermission("MANAGE_USER_DETAILS")) {
+            Optional<User> user = userRepository.findUserByEmail(requestUpdateProfilePictureDto.getEmail());
+            if (user.isPresent()) {
+                User updatedUser = user.get();
+
+                updatedUser.setPronouns(requestUpdateProfilePictureDto.getProfilePicture());
+                userRepository.save(updatedUser);
+
+                return userMapper.userToResponseUserDto(updatedUser);
+            } else {
+                throw new EmailNotFoundException(requestUpdateProfilePictureDto.getEmail());
+            }
+        } else {
+            throw new AccessDeniedException("You do not have permission to update this profile picture.");
+        }
+    }
+
+    @Override
     public boolean deleteUserById(Long id) {
         Optional<User> user = userRepository.findUserById(id);
         if (user.isPresent()) {
