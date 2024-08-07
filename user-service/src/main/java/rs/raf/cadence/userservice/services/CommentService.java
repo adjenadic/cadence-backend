@@ -7,7 +7,7 @@ import rs.raf.cadence.userservice.data.dtos.ResponseCommentDto;
 import java.util.List;
 
 public interface CommentService {
-    List<ResponseCommentDto> findCommentsByUserId(Long id);
+    List<ResponseCommentDto> findCommentsByUserId(Long userId);
 
     ResponseCommentDto findCommentById(Long id);
 

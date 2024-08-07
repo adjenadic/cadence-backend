@@ -5,7 +5,9 @@ import org.springframework.security.core.GrantedAuthority;
 public enum PermissionType implements GrantedAuthority {
     MANAGE_USERNAMES("MANAGE_USERNAMES"),
     MANAGE_PERMISSIONS("MANAGE_PERMISSIONS"),
-    DELETE_USERS("DELETE_USERS");
+    MANAGE_USER_DETAILS("MANAGE_USER_DETAILS"),
+    DELETE_USERS("DELETE_USERS"),
+    DELETE_COMMENTS("DELETE_COMMENTS");
 
     private final String permission;
 

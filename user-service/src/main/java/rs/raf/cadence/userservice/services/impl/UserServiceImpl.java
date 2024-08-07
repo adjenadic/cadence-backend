@@ -102,6 +102,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public ResponseUserDto updateEmail(RequestUpdateEmailDto requestUpdateEmailDto) {
+        if (SpringSecurityUtil.getPrincipalEmail().equals(requestUpdateEmailDto.getCurrentEmail())) {
+            Optional<User> user = userRepository.findUserByEmail(requestUpdateEmailDto.getCurrentEmail());
+            if (user.isPresent()) {
+                User updatedUser = user.get();
+
+                Optional<User> existingUserWithEmail = userRepository.findUserByEmail(requestUpdateEmailDto.getCurrentEmail());
+                if (existingUserWithEmail.isPresent() && !existingUserWithEmail.get().getEmail().equals(requestUpdateEmailDto.getCurrentEmail())) {
+                    throw new EmailAlreadyTakenException(requestUpdateEmailDto.getCurrentEmail());
+                }
+
+                updatedUser.setEmail(requestUpdateEmailDto.getUpdatedEmail());
+                userRepository.save(updatedUser);
+
+                return userMapper.userToResponseUserDto(updatedUser);
+            } else {
+                throw new EmailNotFoundException(requestUpdateEmailDto.getCurrentEmail());
+            }
+        } else {
+            throw new AccessDeniedException("You do not have permission to update this email.");
+        }
+    }
+
+    @Override
     public ResponseUserDto updateUsername(RequestUpdateUsernameDto requestUpdateUsernameDto) {
         if (SpringSecurityUtil.getPrincipalEmail().equals(requestUpdateUsernameDto.getEmail()) ||
                 SpringSecurityUtil.hasPermission("MANAGE_USERNAMES")) {

@@ -42,6 +42,12 @@ public class UserController {
         return ResponseEntity.ok(responseUserDto);
     }
 
+    @PutMapping(value = "/update/email")
+    public ResponseEntity<?> updateEmail(@RequestBody RequestUpdateEmailDto requestUpdateEmailDto) {
+        ResponseUserDto responseUserDto = userService.updateEmail(requestUpdateEmailDto);
+        return ResponseEntity.ok(responseUserDto);
+    }
+
     @PutMapping(value = "/update/username")
     public ResponseEntity<?> updateUsername(@RequestBody RequestUpdateUsernameDto requestUpdateUsernameDto) {
         ResponseUserDto responseUserDto = userService.updateUsername(requestUpdateUsernameDto);

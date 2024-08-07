@@ -17,14 +17,14 @@ import rs.raf.cadence.userservice.services.CommentService;
 public class CommentController {
     private final CommentService commentService;
 
-    @GetMapping(value = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> findCommentById(@PathVariable Long id) {
-        return ResponseEntity.ok(commentService.findCommentById(id));
-    }
-
     @GetMapping(value = "/user-id/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> findCommentsByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(commentService.findCommentsByUserId(userId));
+    }
+
+    @GetMapping(value = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> findCommentById(@PathVariable Long id) {
+        return ResponseEntity.ok(commentService.findCommentById(id));
     }
 
     @PostMapping(value = "/create")

@@ -27,15 +27,15 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
 
-    public ResponseCommentDto findCommentById(Long id) {
-        Comment comment = commentRepository.findById(id).orElseThrow(() -> new IdNotFoundException(id));
-        return commentMapper.commentToResponseCommentDto(comment);
-    }
-
     public List<ResponseCommentDto> findCommentsByUserId(Long userId) {
         return commentRepository.findCommentByUserId(userId).stream()
                 .map(commentMapper::commentToResponseCommentDto)
                 .collect(Collectors.toList());
+    }
+
+    public ResponseCommentDto findCommentById(Long id) {
+        Comment comment = commentRepository.findById(id).orElseThrow(() -> new IdNotFoundException(id));
+        return commentMapper.commentToResponseCommentDto(comment);
     }
 
     public ResponseCommentDto createComment(RequestCreateCommentDto requestCreateCommentDto) {

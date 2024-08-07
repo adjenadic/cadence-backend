@@ -18,6 +18,8 @@ public interface UserService extends UserDetailsService {
 
     ResponseUserDto createUser(RequestCreateUserDto requestCreateUserDto);
 
+    ResponseUserDto updateEmail(RequestUpdateEmailDto requestUpdateEmailDto);
+
     ResponseUserDto updateUsername(RequestUpdateUsernameDto requestUpdateUsernameDto);
 
     ResponseUserDto updatePassword(RequestUpdatePasswordDto requestUpdatePasswordDto);
