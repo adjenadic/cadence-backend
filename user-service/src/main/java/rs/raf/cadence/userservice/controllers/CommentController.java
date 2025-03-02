@@ -22,7 +22,7 @@ public class CommentController {
         return ResponseEntity.ok(commentService.findCommentsByUserId(userId));
     }
 
-    @GetMapping(value = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> findCommentById(@PathVariable Long id) {
         return ResponseEntity.ok(commentService.findCommentById(id));
     }
@@ -51,7 +51,7 @@ public class CommentController {
         return ResponseEntity.ok(responseCommentDto);
     }
 
-    @DeleteMapping(value = "/delete/id/{id}", produces = MediaType.ALL_VALUE)
+    @DeleteMapping(value = "/delete/{id}", produces = MediaType.ALL_VALUE)
     @Transactional
     public ResponseEntity<?> deleteCommentById(@PathVariable Long id) {
         boolean isDeleted = commentService.deleteCommentById(id);

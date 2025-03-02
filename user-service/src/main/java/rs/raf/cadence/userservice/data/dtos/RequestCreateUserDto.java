@@ -11,4 +11,5 @@ public class RequestCreateUserDto {
     private String email;
     private String username;
     private String password;
+    private String confirmedPassword;
 }

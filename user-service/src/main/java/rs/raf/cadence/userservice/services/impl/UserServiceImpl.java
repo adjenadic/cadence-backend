@@ -92,6 +92,10 @@ public class UserServiceImpl implements UserService {
             throw new UsernameAlreadyTakenException(requestCreateUserDto.getUsername());
         }
 
+        if (!requestCreateUserDto.getPassword().equals(requestCreateUserDto.getConfirmedPassword())) {
+            throw new UnmatchedPasswordException();
+        }
+
         User user = userMapper.createRequestUserDtoToUser(requestCreateUserDto);
         user.setPermissions(Set.of());
         user.setPassword(passwordEncoder.encode(requestCreateUserDto.getPassword()));

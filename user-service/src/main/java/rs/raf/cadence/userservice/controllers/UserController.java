@@ -21,17 +21,17 @@ public class UserController {
         return ResponseEntity.ok(userService.findAllUsers());
     }
 
-    @GetMapping(value = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> findUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.findUserById(id));
     }
 
-    @GetMapping(value = "/email/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> findUserByEmail(@PathVariable String email) {
         return ResponseEntity.ok(userService.findUserByEmail(email));
     }
 
-    @GetMapping(value = "/username/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> findUserByUsername(@PathVariable String username) {
         return ResponseEntity.ok(userService.findUserByUsername(username));
     }
@@ -42,57 +42,57 @@ public class UserController {
         return ResponseEntity.ok(responseUserDto);
     }
 
-    @PutMapping(value = "/update/email")
+    @PutMapping(value = "/email")
     public ResponseEntity<?> updateEmail(@RequestBody RequestUpdateEmailDto requestUpdateEmailDto) {
         ResponseUserDto responseUserDto = userService.updateEmail(requestUpdateEmailDto);
         return ResponseEntity.ok(responseUserDto);
     }
 
-    @PutMapping(value = "/update/username")
+    @PutMapping(value = "/username")
     public ResponseEntity<?> updateUsername(@RequestBody RequestUpdateUsernameDto requestUpdateUsernameDto) {
         ResponseUserDto responseUserDto = userService.updateUsername(requestUpdateUsernameDto);
         return ResponseEntity.ok(responseUserDto);
     }
 
-    @PutMapping(value = "/update/password")
+    @PutMapping(value = "/password")
     public ResponseEntity<?> updatePassword(@RequestBody RequestUpdatePasswordDto requestUpdatePasswordDto) {
         ResponseUserDto responseUserDto = userService.updatePassword(requestUpdatePasswordDto);
         return ResponseEntity.ok(responseUserDto);
     }
 
-    @PutMapping(value = "/update/pronouns")
+    @PutMapping(value = "/pronouns")
     public ResponseEntity<?> updatePronouns(@RequestBody RequestUpdatePronounsDto requestUpdatePronounsDtoDto) {
         ResponseUserDto responseUserDto = userService.updatePronouns(requestUpdatePronounsDtoDto);
         return ResponseEntity.ok(responseUserDto);
     }
 
-    @PutMapping(value = "/update/about-me")
+    @PutMapping(value = "/about-me")
     public ResponseEntity<?> updateAboutMe(@RequestBody RequestUpdateAboutMeDto requestUpdateAboutMeDto) {
         ResponseUserDto responseUserDto = userService.updateAboutMe(requestUpdateAboutMeDto);
         return ResponseEntity.ok(responseUserDto);
     }
 
-    @PutMapping(value = "/update/password")
+    @PutMapping(value = "/password")
     public ResponseEntity<?> updateProfilePicture(@RequestBody RequestUpdateProfilePictureDto requestUpdateProfilePictureDto) {
         ResponseUserDto responseUserDto = userService.updateProfilePicture(requestUpdateProfilePictureDto);
         return ResponseEntity.ok(responseUserDto);
     }
 
-    @PutMapping(value = "/update/permissions")
+    @PutMapping(value = "/permissions")
     @PreAuthorize("hasAuthority('MANAGE_PERMISSIONS')")
     public ResponseEntity<?> updatePermissions(@RequestBody RequestUpdatePermissionsDto requestUpdatePermissionsDto) {
         ResponseUserDto responseUserDto = userService.updatePermissions(requestUpdatePermissionsDto);
         return ResponseEntity.ok(responseUserDto);
     }
 
-    @DeleteMapping(value = "/delete/id/{id}", produces = MediaType.ALL_VALUE)
+    @DeleteMapping(value = "/{id}", produces = MediaType.ALL_VALUE)
     @Transactional
     public ResponseEntity<?> deleteUserById(@PathVariable Long id) {
         boolean isDeleted = userService.deleteUserById(id);
         return ResponseEntity.ok(isDeleted);
     }
 
-    @DeleteMapping(value = "/delete/email/{email}", produces = MediaType.ALL_VALUE)
+    @DeleteMapping(value = "/{email}", produces = MediaType.ALL_VALUE)
     @Transactional
     public ResponseEntity<?> deleteUserByEmail(@PathVariable String email) {
         boolean isDeleted = userService.deleteUserByEmail(email);
