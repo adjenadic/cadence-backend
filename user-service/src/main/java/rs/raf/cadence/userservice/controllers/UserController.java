@@ -72,7 +72,7 @@ public class UserController {
         return ResponseEntity.ok(responseUserDto);
     }
 
-    @PutMapping(value = "/password")
+    @PutMapping(value = "/profile-picture")
     public ResponseEntity<?> updateProfilePicture(@RequestBody RequestUpdateProfilePictureDto requestUpdateProfilePictureDto) {
         ResponseUserDto responseUserDto = userService.updateProfilePicture(requestUpdateProfilePictureDto);
         return ResponseEntity.ok(responseUserDto);

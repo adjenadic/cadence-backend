@@ -1,4 +1,4 @@
-package rs.raf.cadence.userservice.configuration;
+package rs.raf.cadence.notificationservice.configuration;
 
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
