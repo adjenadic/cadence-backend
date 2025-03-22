@@ -14,6 +14,7 @@ import java.util.Set;
 public class ResponseUserDto {
     private Long id;
     private String email;
+    private boolean emailVerified;
     private String username;
     private String pronouns;
     private String aboutMe;

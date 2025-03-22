@@ -23,6 +23,7 @@ public class UserMapper {
         return new ResponseUserDto(
                 user.getId(),
                 user.getEmail(),
+                user.isEmailVerified(),
                 user.getUsername(),
                 user.getPronouns(),
                 user.getAboutMe(),

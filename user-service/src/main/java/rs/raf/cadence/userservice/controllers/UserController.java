@@ -7,6 +7,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import rs.raf.cadence.userservice.data.dtos.*;
+import rs.raf.cadence.userservice.exceptions.EmailNotFoundException;
+import rs.raf.cadence.userservice.exceptions.InvalidVerificationCodeException;
+import rs.raf.cadence.userservice.exceptions.VerificationCodeExpiredException;
+import rs.raf.cadence.userservice.exceptions.VerificationCodeNotFoundException;
 import rs.raf.cadence.userservice.services.UserService;
 
 @RestController
@@ -40,6 +44,20 @@ public class UserController {
     public ResponseEntity<?> createUser(@RequestBody RequestCreateUserDto requestCreateUserDto) {
         ResponseUserDto responseUserDto = userService.createUser(requestCreateUserDto);
         return ResponseEntity.ok(responseUserDto);
+    }
+
+    @PostMapping(value = "/verify-email")
+    public ResponseEntity<?> verifyEmail(@RequestBody RequestEmailVerificationDto verificationDto) {
+        try {
+            userService.verifyEmail(verificationDto.getEmail(), verificationDto.getVerificationCode());
+            return ResponseEntity.ok().build();
+        } catch (EmailNotFoundException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        } catch (VerificationCodeNotFoundException | InvalidVerificationCodeException e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        } catch (VerificationCodeExpiredException e) {
+            return ResponseEntity.status(410).body(e.getMessage());
+        }
     }
 
     @PutMapping(value = "/email")

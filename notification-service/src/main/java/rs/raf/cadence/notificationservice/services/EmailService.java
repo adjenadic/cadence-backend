@@ -13,9 +13,11 @@ public class EmailService {
 
     public void sendEmail(EmailNotification notification) {
         SimpleMailMessage message = new SimpleMailMessage();
+
         message.setTo(notification.getTo());
         message.setSubject(notification.getSubject());
         message.setText(notification.getContent());
+
         mailSender.send(message);
     }
 }

@@ -19,6 +19,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String email;
+    private boolean emailVerified = false;
+    private String verificationCode;
+    private Long verificationCodeExpiry;
     private String username;
     private String password;
     private String pronouns;
