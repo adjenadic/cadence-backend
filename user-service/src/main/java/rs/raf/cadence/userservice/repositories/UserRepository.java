@@ -37,6 +37,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findUserByUsername(String username);
 
     /**
+     * Retrieves an optional user by their verification token.
+     *
+     * @param verificationToken the verification token of the user
+     * @return an Optional containing the found user, or an empty Optional if no user was found with the provided verification token
+     */
+    Optional<User> findByVerificationToken(String verificationToken);
+
+    /**
      * Deletes an entity by their unique identifier.
      *
      * @param id the unique identifier of the user

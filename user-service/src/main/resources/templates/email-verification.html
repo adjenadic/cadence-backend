@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <style>
+        body {
+            font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: #ffffff;
+            background-color: #0d0d0d;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background-color: #1a1a1a;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 30px;
+            border: 1px solid #333;
+        }
+
+        .content {
+            background-color: #1a1a1a;
+            padding: 30px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            color: #ffffff;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: #ffffff;
+            color: #0d0d0d;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            margin: 20px 0;
+            border: 1px solid #0d0d0d;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #cccccc;
+        }
+
+        .subtitle {
+            color: #cccccc;
+            margin: 0;
+        }
+    </style>
+    <title>Verify Your Email</title>
+</head>
+<body>
+<div class="header">
+    <img th:src="${logoUrl}" alt="Cadence" style="height: 40px; margin-bottom: 10px;"/>
+    <p class="subtitle">Email Verification</p>
+</div>
+<div class="content">
+    <p>Dear <span th:text="${username}"></span>,</p>
+    <p>Thank you for registering with Cadence. To complete your account setup, please verify your email address by
+        clicking the button below:</p>
+    <div style="text-align: center;">
+        <a th:href="${verificationUrl}" class="button">Verify Email Address</a>
+    </div>
+    <p>This verification link will expire in 24 hours for security purposes.</p>
+    <p>If you didn't create an account with Cadence, please ignore this email.</p>
+    <p>Best regards,<br>The Cadence Team</p>
+</div>
+<div class="footer">
+    <p>This is an automated message from Cadence. Please do not reply to this email.</p>
+</div>
+</body>
+</html>

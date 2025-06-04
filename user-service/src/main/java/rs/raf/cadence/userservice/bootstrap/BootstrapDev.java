@@ -40,6 +40,8 @@ public class BootstrapDev implements CommandLineRunner {
         admin.setUsername("admin");
         admin.setPassword(passwordEncoder.encode("admin"));
         admin.setPermissions(adminPermissions);
+        admin.setEmailVerified(true);
+        admin.setVerificationTokenExpiry(0L);
         userRepository.save(admin);
 
         User user = new User();
@@ -47,6 +49,8 @@ public class BootstrapDev implements CommandLineRunner {
         user.setUsername("user");
         user.setPassword(passwordEncoder.encode("user"));
         user.setPermissions(new HashSet<>());
+        user.setEmailVerified(true);
+        user.setVerificationTokenExpiry(0L);
         userRepository.save(user);
     }
 }

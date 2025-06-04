@@ -2,11 +2,14 @@ package rs.raf.cadence.userservice.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 import rs.raf.cadence.userservice.data.dtos.*;
 import rs.raf.cadence.userservice.data.entities.Permission;
 import rs.raf.cadence.userservice.data.entities.User;
@@ -24,13 +27,15 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private static final int VERIFICATION_CODE_LENGTH = 6;
+    @Value("${app.frontend.url}")
+    public static String FRONTEND_URL;
 
     private final RabbitTemplate rabbitTemplate;
     private final UserRepository userRepository;
     private final PermissionRepository permissionRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final TemplateEngine templateEngine;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -85,30 +90,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void verifyEmail(String email, String code) {
-        User user = userRepository.findUserByEmail(email).orElseThrow(() -> new EmailNotFoundException(email));
+    public boolean verifyEmail(String token) {
+        User user = userRepository.findByVerificationToken(token)
+                .orElseThrow(InvalidVerificationCodeException::new);
 
         if (user.isEmailVerified()) {
-            return;
+            throw new IllegalStateException("Email is already verified.");
         }
 
-        if (user.getVerificationCode() == null) {
-            throw new VerificationCodeNotFoundException(user.getEmail());
-        }
-
-        if (!user.getVerificationCode().equals(code)) {
-            throw new InvalidVerificationCodeException();
-        }
-
-        if (System.currentTimeMillis() > user.getVerificationCodeExpiry()) {
-            userRepository.deleteByEmail(email);
+        if (System.currentTimeMillis() > user.getVerificationTokenExpiry()) {
             throw new VerificationCodeExpiredException(user.getEmail());
         }
 
         user.setEmailVerified(true);
-        user.setVerificationCode(null);
-        user.setVerificationCodeExpiry(null);
+        user.setVerificationTokenExpiry(0L);
         userRepository.save(user);
+        return true;
     }
 
     @Override
@@ -235,7 +232,7 @@ public class UserServiceImpl implements UserService {
             if (user.isPresent()) {
                 User updatedUser = user.get();
 
-                updatedUser.setPronouns(requestUpdateAboutMeDto.getAboutMe());
+                updatedUser.setAboutMe(requestUpdateAboutMeDto.getAboutMe());
                 userRepository.save(updatedUser);
 
                 return userMapper.userToResponseUserDto(updatedUser);
@@ -254,7 +251,7 @@ public class UserServiceImpl implements UserService {
             if (user.isPresent()) {
                 User updatedUser = user.get();
 
-                updatedUser.setPronouns(requestUpdateProfilePictureDto.getProfilePicture());
+                updatedUser.setProfilePicture(requestUpdateProfilePictureDto.getProfilePicture());
                 userRepository.save(updatedUser);
 
                 return userMapper.userToResponseUserDto(updatedUser);
@@ -297,25 +294,27 @@ public class UserServiceImpl implements UserService {
     }
 
     private void sendVerificationEmail(User user) {
-        String code = generateVerificationCode();
-        user.setVerificationCode(code);
-        user.setVerificationCodeExpiry(System.currentTimeMillis() + (15 * 60 * 1000));
+        String token = UUID.randomUUID().toString();
+        user.setVerificationToken(token);
+        user.setVerificationTokenExpiry(System.currentTimeMillis() + (24 * 60 * 60 * 1000)); // 24 hours
         userRepository.save(user);
+
+        String verificationUrl = FRONTEND_URL + "/verify-email?token=" + token;
 
         Map<String, Object> message = new HashMap<>();
         message.put("to", user.getEmail());
-        message.put("subject", "Verify Your Email");
-        message.put("content", "Your verification code is: " + code);
+        message.put("username", user.getUsername());
+        message.put("subject", "Cadence - Verify Your Email");
+
+        Context context = new Context();
+        context.setVariable("logoUrl", FRONTEND_URL + "/assets/logo/cadence_light_full.png");
+        context.setVariable("username", user.getUsername());
+        context.setVariable("verificationUrl", verificationUrl);
+
+        String htmlContent = templateEngine.process("email-verification", context);
+        message.put("content", htmlContent);
+        message.put("contentType", "text/html");
 
         rabbitTemplate.convertAndSend("account-verification", message);
-    }
-
-    private String generateVerificationCode() {
-        Random random = new Random();
-        StringBuilder code = new StringBuilder();
-        for (int i = 0; i < VERIFICATION_CODE_LENGTH; i++) {
-            code.append(random.nextInt(10));
-        }
-        return code.toString();
     }
 }

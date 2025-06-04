@@ -1,17 +1,18 @@
 package rs.raf.cadence.userservice.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import rs.raf.cadence.userservice.data.dtos.*;
-import rs.raf.cadence.userservice.exceptions.EmailNotFoundException;
-import rs.raf.cadence.userservice.exceptions.InvalidVerificationCodeException;
-import rs.raf.cadence.userservice.exceptions.VerificationCodeExpiredException;
-import rs.raf.cadence.userservice.exceptions.VerificationCodeNotFoundException;
+import rs.raf.cadence.userservice.exceptions.*;
 import rs.raf.cadence.userservice.services.UserService;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @CrossOrigin
@@ -42,15 +43,25 @@ public class UserController {
 
     @PostMapping(value = "/create")
     public ResponseEntity<?> createUser(@RequestBody RequestCreateUserDto requestCreateUserDto) {
-        ResponseUserDto responseUserDto = userService.createUser(requestCreateUserDto);
-        return ResponseEntity.ok(responseUserDto);
+        try {
+            ResponseUserDto responseUserDto = userService.createUser(requestCreateUserDto);
+            return ResponseEntity.ok(responseUserDto);
+        } catch (EmailAlreadyTakenException | UsernameAlreadyTakenException | UnmatchedPasswordException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Registration failed");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
     }
 
     @PostMapping(value = "/verify-email")
-    public ResponseEntity<?> verifyEmail(@RequestBody RequestEmailVerificationDto verificationDto) {
+    public ResponseEntity<?> verifyEmail(@RequestParam String verificationToken) {
         try {
-            userService.verifyEmail(verificationDto.getEmail(), verificationDto.getVerificationCode());
-            return ResponseEntity.ok().build();
+            boolean verified = userService.verifyEmail(verificationToken);
+            return ResponseEntity.ok(verified);
         } catch (EmailNotFoundException e) {
             return ResponseEntity.status(404).body(e.getMessage());
         } catch (VerificationCodeNotFoundException | InvalidVerificationCodeException e) {
@@ -74,8 +85,18 @@ public class UserController {
 
     @PutMapping(value = "/password")
     public ResponseEntity<?> updatePassword(@RequestBody RequestUpdatePasswordDto requestUpdatePasswordDto) {
-        ResponseUserDto responseUserDto = userService.updatePassword(requestUpdatePasswordDto);
-        return ResponseEntity.ok(responseUserDto);
+        try {
+            ResponseUserDto responseUserDto = userService.updatePassword(requestUpdatePasswordDto);
+            return ResponseEntity.ok(responseUserDto);
+        } catch (EmailNotFoundException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        } catch (IllegalArgumentException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
     }
 
     @PutMapping(value = "/pronouns")

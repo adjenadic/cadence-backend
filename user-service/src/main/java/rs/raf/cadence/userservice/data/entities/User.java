@@ -20,8 +20,8 @@ public class User {
     private Long id;
     private String email;
     private boolean emailVerified = false;
-    private String verificationCode;
-    private Long verificationCodeExpiry;
+    private String verificationToken;
+    private Long verificationTokenExpiry;
     private String username;
     private String password;
     private String pronouns;
