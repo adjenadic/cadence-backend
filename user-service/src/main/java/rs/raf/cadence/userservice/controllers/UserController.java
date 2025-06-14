@@ -31,12 +31,12 @@ public class UserController {
         return ResponseEntity.ok(userService.findUserById(id));
     }
 
-    @GetMapping(value = "/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/email/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> findUserByEmail(@PathVariable String email) {
         return ResponseEntity.ok(userService.findUserByEmail(email));
     }
 
-    @GetMapping(value = "/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/username/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> findUserByUsername(@PathVariable String username) {
         return ResponseEntity.ok(userService.findUserByUsername(username));
     }
