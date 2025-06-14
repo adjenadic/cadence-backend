@@ -26,6 +26,7 @@ public class User {
     private String password;
     private String pronouns;
     private String aboutMe;
+    @Column(columnDefinition = "TEXT")
     private String profilePicture;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

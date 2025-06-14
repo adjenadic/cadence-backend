@@ -5,7 +5,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public class SpringSecurityUtil {
     static public String getPrincipalEmail() {
-        return ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetails) {
+            return ((UserDetails) principal).getUsername();
+        }
+        return principal.toString();
     }
 
     static public boolean hasPermission(String permission) {
