@@ -1,6 +1,8 @@
 package rs.raf.cadence.userservice.services.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,6 +26,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
+
     private final UserRepository userRepository;
     private final PermissionRepository permissionRepository;
     private final UserMapper userMapper;
@@ -187,7 +191,11 @@ public class UserServiceImpl implements UserService {
                 permissions = requestUpdatePermissionsDto.getPermissions().stream().map(permissionTypeStr -> {
                     try {
                         PermissionType permissionType = PermissionType.valueOf(permissionTypeStr);
-                        return permissionRepository.findPermissionByPermissionType(permissionType).orElse(null);
+                        Optional<Permission> permission = permissionRepository.findPermissionByPermissionType(permissionType);
+                        if (permission.isEmpty()) {
+                            LOGGER.warn("Permission {} not found in database", permissionType);
+                        }
+                        return permission.orElse(null);
                     } catch (IllegalArgumentException e) {
                         return null;
                     }

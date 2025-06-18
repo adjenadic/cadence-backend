@@ -25,10 +25,14 @@ public class BootstrapDev implements CommandLineRunner {
         Permission permission1 = new Permission(PermissionType.MANAGE_USERNAMES);
         Permission permission2 = new Permission(PermissionType.MANAGE_PERMISSIONS);
         Permission permission3 = new Permission(PermissionType.DELETE_USERS);
+        Permission permission4 = new Permission(PermissionType.MANAGE_USER_DETAILS);
+        Permission permission5 = new Permission(PermissionType.DELETE_COMMENTS);
 
         permission1 = permissionRepository.save(permission1);
         permission2 = permissionRepository.save(permission2);
         permission3 = permissionRepository.save(permission3);
+        permission4 = permissionRepository.save(permission4);
+        permission5 = permissionRepository.save(permission5);
 
         Set<Permission> adminPermissions = new HashSet<>();
         adminPermissions.add(permission1);
