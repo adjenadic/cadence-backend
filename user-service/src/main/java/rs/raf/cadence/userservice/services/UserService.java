@@ -16,9 +16,9 @@ public interface UserService extends UserDetailsService {
 
     ResponseUserDto findUserByUsername(String username);
 
-    ResponseUserDto createUser(RequestCreateUserDto requestCreateUserDto);
-
     boolean verifyEmail(String verificationToken);
+
+    ResponseUserDto createUser(RequestCreateUserDto requestCreateUserDto);
 
     ResponseUserDto updateEmail(RequestUpdateEmailDto requestUpdateEmailDto);
 

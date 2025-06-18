@@ -41,6 +41,14 @@
             border: 1px solid #0d0d0d;
         }
 
+        .warning {
+            background-color: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+
         .footer {
             text-align: center;
             margin-top: 30px;
@@ -53,22 +61,29 @@
             margin: 0;
         }
     </style>
-    <title>Verify Your Email</title>
+    <title>Verify Your Email Change</title>
 </head>
 <body>
 <div class="header">
     <img th:src="${logoUrl}" alt="Cadence" style="height: 40px; margin-bottom: 10px;"/>
-    <p class="subtitle">Email Verification</p>
+    <p class="subtitle">Email Change Verification</p>
 </div>
 <div class="content">
-    <p>Dear <span th:text="${username}"></span>,</p>
-    <p>Thank you for registering with Cadence. To complete your account setup, please verify your email address by
-        clicking the button below:</p>
+    <p>Hello <span th:text="${username}"></span>,</p>
+    <p>Your Cadence account email address has been changed to this address. To complete this change and regain access to
+        your account, please verify your new email address by clicking the button below:</p>
+
     <div style="text-align: center;">
-        <a th:href="${verificationUrl}" class="button">Verify Email Address</a>
+        <a th:href="${verificationUrl}" class="button">Verify New Email Address</a>
     </div>
+
+    <div class="warning">
+        <strong>Important:</strong> If you did not request this email change, please contact our support team
+        immediately at support@cadence.com. Your account will remain inaccessible until this email is verified.
+    </div>
+
     <p>This verification link will expire in 24 hours for security purposes.</p>
-    <p>If you didn't create an account with Cadence, please ignore this email.</p>
+    <p>Until verified, you will not be able to access your account.</p>
     <p>Best regards,<br>The Cadence Team</p>
 </div>
 <div class="footer">

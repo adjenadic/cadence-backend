@@ -13,13 +13,13 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Queue passwordChangeQueue() {
-        return new Queue("password-change", false);
+    public Queue emailChangeQueue() {
+        return new Queue("email-change", false);
     }
 
     @Bean
-    public Queue emailChangeQueue() {
-        return new Queue("email-change", false);
+    public Queue passwordChangeQueue() {
+        return new Queue("password-change", false);
     }
 
     @Bean

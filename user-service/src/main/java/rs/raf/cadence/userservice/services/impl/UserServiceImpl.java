@@ -1,15 +1,11 @@
 package rs.raf.cadence.userservice.services.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
 import rs.raf.cadence.userservice.data.dtos.*;
 import rs.raf.cadence.userservice.data.entities.Permission;
 import rs.raf.cadence.userservice.data.entities.User;
@@ -18,6 +14,7 @@ import rs.raf.cadence.userservice.exceptions.*;
 import rs.raf.cadence.userservice.mappers.UserMapper;
 import rs.raf.cadence.userservice.repositories.PermissionRepository;
 import rs.raf.cadence.userservice.repositories.UserRepository;
+import rs.raf.cadence.userservice.services.MessageDispatchService;
 import rs.raf.cadence.userservice.services.UserService;
 import rs.raf.cadence.userservice.utils.SpringSecurityUtil;
 
@@ -27,15 +24,11 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    @Value("${app.frontend.url}")
-    public static String FRONTEND_URL;
-
-    private final RabbitTemplate rabbitTemplate;
     private final UserRepository userRepository;
     private final PermissionRepository permissionRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    private final TemplateEngine templateEngine;
+    private final MessageDispatchService messageDispatchService;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -64,6 +57,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean verifyEmail(String token) {
+        User user = userRepository.findByVerificationToken(token)
+                .orElseThrow(InvalidVerificationCodeException::new);
+
+        if (user.isEmailVerified()) {
+            throw new IllegalStateException("Email is already verified.");
+        }
+
+        if (System.currentTimeMillis() > user.getVerificationTokenExpiry()) {
+            throw new VerificationCodeExpiredException(user.getEmail());
+        }
+
+        user.setEmailVerified(true);
+        user.setVerificationTokenExpiry(0L);
+        userRepository.save(user);
+        return true;
+    }
+
+    @Override
     public ResponseUserDto createUser(RequestCreateUserDto requestCreateUserDto) {
         if (userRepository.findUserByEmail(requestCreateUserDto.getEmail()).isPresent()) {
             throw new EmailAlreadyTakenException(requestCreateUserDto.getEmail());
@@ -84,28 +96,9 @@ public class UserServiceImpl implements UserService {
 
         User createdUser = userRepository.save(user);
 
-        sendVerificationEmail(createdUser);
+        messageDispatchService.sendAccountVerificationEmail(createdUser);
 
         return userMapper.userToResponseUserDto(createdUser);
-    }
-
-    @Override
-    public boolean verifyEmail(String token) {
-        User user = userRepository.findByVerificationToken(token)
-                .orElseThrow(InvalidVerificationCodeException::new);
-
-        if (user.isEmailVerified()) {
-            throw new IllegalStateException("Email is already verified.");
-        }
-
-        if (System.currentTimeMillis() > user.getVerificationTokenExpiry()) {
-            throw new VerificationCodeExpiredException(user.getEmail());
-        }
-
-        user.setEmailVerified(true);
-        user.setVerificationTokenExpiry(0L);
-        userRepository.save(user);
-        return true;
     }
 
     @Override
@@ -115,13 +108,15 @@ public class UserServiceImpl implements UserService {
             if (user.isPresent()) {
                 User updatedUser = user.get();
 
-                Optional<User> existingUserWithEmail = userRepository.findUserByEmail(requestUpdateEmailDto.getCurrentEmail());
-                if (existingUserWithEmail.isPresent() && !existingUserWithEmail.get().getEmail().equals(requestUpdateEmailDto.getCurrentEmail())) {
-                    throw new EmailAlreadyTakenException(requestUpdateEmailDto.getCurrentEmail());
+                if (userRepository.findUserByEmail(requestUpdateEmailDto.getUpdatedEmail()).isPresent()) {
+                    throw new EmailAlreadyTakenException(requestUpdateEmailDto.getUpdatedEmail());
                 }
 
                 updatedUser.setEmail(requestUpdateEmailDto.getUpdatedEmail());
+                updatedUser.setEmailVerified(false);
                 userRepository.save(updatedUser);
+
+                messageDispatchService.sendEmailChangeEmail(updatedUser);
 
                 return userMapper.userToResponseUserDto(updatedUser);
             } else {
@@ -172,6 +167,8 @@ public class UserServiceImpl implements UserService {
 
             updatedUser.setPassword(passwordEncoder.encode(requestUpdatePasswordDto.getUpdatedPassword()));
             userRepository.save(updatedUser);
+
+            messageDispatchService.sendPasswordChangeEmail(updatedUser);
 
             return userMapper.userToResponseUserDto(updatedUser);
         } else {
@@ -291,30 +288,5 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new EmailNotFoundException(email);
         }
-    }
-
-    private void sendVerificationEmail(User user) {
-        String token = UUID.randomUUID().toString();
-        user.setVerificationToken(token);
-        user.setVerificationTokenExpiry(System.currentTimeMillis() + (24 * 60 * 60 * 1000)); // 24 hours
-        userRepository.save(user);
-
-        String verificationUrl = FRONTEND_URL + "/verify-email?token=" + token;
-
-        Map<String, Object> message = new HashMap<>();
-        message.put("to", user.getEmail());
-        message.put("username", user.getUsername());
-        message.put("subject", "Cadence - Verify Your Email");
-
-        Context context = new Context();
-        context.setVariable("logoUrl", FRONTEND_URL + "/assets/logo/cadence_light_full.png");
-        context.setVariable("username", user.getUsername());
-        context.setVariable("verificationUrl", verificationUrl);
-
-        String htmlContent = templateEngine.process("email-verification", context);
-        message.put("content", htmlContent);
-        message.put("contentType", "text/html");
-
-        rabbitTemplate.convertAndSend("account-verification", message);
     }
 }

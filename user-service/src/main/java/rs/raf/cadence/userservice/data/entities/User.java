@@ -25,6 +25,7 @@ public class User {
     private String username;
     private String password;
     private String pronouns;
+    @Column(length = 512)
     private String aboutMe;
     @Column(columnDefinition = "TEXT")
     private String profilePicture;

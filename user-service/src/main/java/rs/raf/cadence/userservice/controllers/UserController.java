@@ -41,6 +41,20 @@ public class UserController {
         return ResponseEntity.ok(userService.findUserByUsername(username));
     }
 
+    @PostMapping(value = "/verify-email")
+    public ResponseEntity<?> verifyEmail(@RequestParam String verificationToken) {
+        try {
+            boolean verified = userService.verifyEmail(verificationToken);
+            return ResponseEntity.ok(verified);
+        } catch (EmailNotFoundException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        } catch (VerificationCodeNotFoundException | InvalidVerificationCodeException e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        } catch (VerificationCodeExpiredException e) {
+            return ResponseEntity.status(410).body(e.getMessage());
+        }
+    }
+
     @PostMapping(value = "/create")
     public ResponseEntity<?> createUser(@RequestBody RequestCreateUserDto requestCreateUserDto) {
         try {
@@ -54,20 +68,6 @@ public class UserController {
             Map<String, String> error = new HashMap<>();
             error.put("message", "Registration failed");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-        }
-    }
-
-    @PostMapping(value = "/verify-email")
-    public ResponseEntity<?> verifyEmail(@RequestParam String verificationToken) {
-        try {
-            boolean verified = userService.verifyEmail(verificationToken);
-            return ResponseEntity.ok(verified);
-        } catch (EmailNotFoundException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        } catch (VerificationCodeNotFoundException | InvalidVerificationCodeException e) {
-            return ResponseEntity.status(400).body(e.getMessage());
-        } catch (VerificationCodeExpiredException e) {
-            return ResponseEntity.status(410).body(e.getMessage());
         }
     }
 
