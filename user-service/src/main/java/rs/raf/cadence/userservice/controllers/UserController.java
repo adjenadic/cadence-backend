@@ -131,7 +131,7 @@ public class UserController {
         return ResponseEntity.ok(isDeleted);
     }
 
-    @DeleteMapping(value = "/{email}", produces = MediaType.ALL_VALUE)
+    @DeleteMapping(value = "/email/{email}", produces = MediaType.ALL_VALUE)
     @Transactional
     public ResponseEntity<?> deleteUserByEmail(@PathVariable String email) {
         boolean isDeleted = userService.deleteUserByEmail(email);
