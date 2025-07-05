@@ -26,8 +26,15 @@ public class DataImportService {
     }
 
     public void importCsvData() {
-        importArtists();
-        importAlbums();
+        if (artistRepository.count() == 0) {
+            logger.info("Artist data not found, importing from CSV file...");
+            importArtists();
+        } else if (albumRepository.count() == 0) {
+            logger.info("Album data not found, importing from CSV file...");
+            importAlbums();
+        } else {
+            logger.info("Artist data already exists, skipping import");
+        }
     }
 
     private void importArtists() {

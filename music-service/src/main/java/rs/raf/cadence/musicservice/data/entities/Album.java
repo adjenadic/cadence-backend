@@ -37,6 +37,8 @@ public class Album {
     @CsvBindByPosition(position = 11)
     private String strReleaseFormat;
     @CsvBindByPosition(position = 12)
+    private String intSales;
+    @CsvBindByPosition(position = 13)
     private String strAlbumThumb;
     @CsvBindByPosition(position = 14)
     private String strAlbumThumbHQ;
