@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RequestCreateCommentDto {
+public class RequestUpdateChirpDto {
+    private String email;
+    private Long chirpId;
     private String content;
-    private Long userId;
-    private Long commenterId;
 }

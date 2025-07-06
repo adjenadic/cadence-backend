@@ -6,11 +6,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "comments")
+@Table(name = "chirps")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Comment {
+public class Chirp {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,18 +22,18 @@ public class Comment {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "commenter_id", nullable = false)
-    private User commenter;
+    @JoinColumn(name = "chirper_id", nullable = false)
+    private User chirper;
 
     private Long likes;
 
     private boolean edited;
 
-    public Comment(String content, User user, User commenter) {
+    public Chirp(String content, User user, User chirper) {
         this.content = content;
         this.timestamp = System.currentTimeMillis();
         this.user = user;
-        this.commenter = commenter;
+        this.chirper = chirper;
         this.likes = 0L;
         this.edited = false;
     }

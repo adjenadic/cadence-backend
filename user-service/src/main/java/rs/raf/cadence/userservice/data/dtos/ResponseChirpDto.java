@@ -7,12 +7,14 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResponseCommentDto {
+public class ResponseChirpDto {
     private Long id;
     private String content;
     private Long timestamp;
     private Long userId;
-    private Long commenterId;
+    private Long chirperId;
+    private String chirperUsername;
+    private String chirperProfilePicture;
     private Long likes;
     private boolean edited;
 }

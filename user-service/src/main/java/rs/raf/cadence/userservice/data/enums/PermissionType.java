@@ -7,7 +7,7 @@ public enum PermissionType implements GrantedAuthority {
     MANAGE_PERMISSIONS("MANAGE_PERMISSIONS"),
     MANAGE_USER_DETAILS("MANAGE_USER_DETAILS"),
     DELETE_USERS("DELETE_USERS"),
-    DELETE_COMMENTS("DELETE_COMMENTS");
+    DELETE_CHIRPS("DELETE_CHIRPS");
 
     private final String permission;
 
