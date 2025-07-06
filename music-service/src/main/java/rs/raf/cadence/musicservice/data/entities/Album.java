@@ -4,6 +4,7 @@ import com.opencsv.bean.CsvBindByPosition;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "albums")
@@ -12,6 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Album {
     @Id
     private String id;
+    @Indexed(unique = true)
     @CsvBindByPosition(position = 0)
     private Long idAlbum;
     @CsvBindByPosition(position = 1)

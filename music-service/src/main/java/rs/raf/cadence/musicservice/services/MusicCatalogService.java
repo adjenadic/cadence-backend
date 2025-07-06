@@ -3,13 +3,18 @@ package rs.raf.cadence.musicservice.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import rs.raf.cadence.musicservice.data.dtos.AlbumSummaryDto;
+import rs.raf.cadence.musicservice.data.dtos.ArtistSummaryDto;
+import rs.raf.cadence.musicservice.data.dtos.SearchResultsDto;
 import rs.raf.cadence.musicservice.data.entities.Album;
 import rs.raf.cadence.musicservice.data.entities.Artist;
+import rs.raf.cadence.musicservice.mappers.MusicCatalogMapper;
 import rs.raf.cadence.musicservice.repositories.AlbumRepository;
 import rs.raf.cadence.musicservice.repositories.ArtistRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -17,14 +22,40 @@ import java.util.Optional;
 public class MusicCatalogService {
     private final ArtistRepository artistRepository;
     private final AlbumRepository albumRepository;
+    private final MusicCatalogMapper mapper;
+
+    public SearchResultsDto searchAll(String query) {
+        log.info("Searching for artists and albums with query: {}", query);
+
+        List<ArtistSummaryDto> artists = artistRepository.findByStrArtistContainingIgnoreCase(query)
+                .stream()
+                .limit(5)
+                .map(mapper::artistToArtistSummaryDto)
+                .collect(Collectors.toList());
+
+        List<AlbumSummaryDto> albums = albumRepository.findByStrAlbumContainingIgnoreCaseOrStrArtistContainingIgnoreCase(query, query)
+                .stream()
+                .limit(5)
+                .map(mapper::albumToAlbumSummaryDto)
+                .collect(Collectors.toList());
+
+        return new SearchResultsDto(artists, albums);
+    }
 
     public Optional<Album> getAlbumById(String id) {
         log.info("Fetching album by id: {}", id);
 
-        Optional<Album> album = albumRepository.findById(id);
+        Long idAlbumValue = null;
+        try {
+            idAlbumValue = Long.parseLong(id);
+        } catch (NumberFormatException e) {
+            log.info("{} is not a number, searching only by id", id);
+        }
+
+        Optional<Album> album = albumRepository.findFirstByIdOrIdAlbum(id, idAlbumValue);
 
         if (album.isPresent()) {
-            log.info("Found album: {}", album.get().getStrAlbum());
+            log.info("Found album with idAlbum: {}", album.get().getIdAlbum());
         } else {
             log.warn("Album not found with id: {}", id);
         }

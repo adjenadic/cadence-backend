@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ArtistRepository extends MongoRepository<Artist, String> {
+    List<Artist> findByStrArtistContainingIgnoreCase(String artistName);
+
     Optional<Artist> findFirstByIdOrIdArtist(String id, Long idArtist);
 
     @Aggregation(pipeline = {

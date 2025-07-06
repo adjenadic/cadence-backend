@@ -5,8 +5,13 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import rs.raf.cadence.musicservice.data.entities.Album;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface AlbumRepository extends MongoRepository<Album, String> {
+    List<Album> findByStrAlbumContainingIgnoreCaseOrStrArtistContainingIgnoreCase(String albumName, String artistName);
+
+    Optional<Album> findFirstByIdOrIdAlbum(String id, Long idAlbum);
+
     @Aggregation(pipeline = {
             "{ $match: { 'strAlbumThumb': { $nin: [null, '0', ''] } } }",
             "{ $sample: { size: ?0 } }"

@@ -1,10 +1,12 @@
 package rs.raf.cadence.musicservice.controllers;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rs.raf.cadence.musicservice.data.dtos.AlbumSummaryDto;
 import rs.raf.cadence.musicservice.data.dtos.ArtistSummaryDto;
+import rs.raf.cadence.musicservice.data.dtos.SearchResultsDto;
 import rs.raf.cadence.musicservice.data.entities.Album;
 import rs.raf.cadence.musicservice.data.entities.Artist;
 import rs.raf.cadence.musicservice.mappers.MusicCatalogMapper;
@@ -17,9 +19,16 @@ import java.util.stream.Collectors;
 @CrossOrigin
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/music")
+@Slf4j
 public class MusicCatalogController {
     private final MusicCatalogService musicCatalogService;
     private final MusicCatalogMapper musicCatalogMapper;
+
+    @GetMapping("/search")
+    public ResponseEntity<SearchResultsDto> search(@RequestParam String q) {
+        SearchResultsDto results = musicCatalogService.searchAll(q);
+        return ResponseEntity.ok(results);
+    }
 
     @GetMapping("/albums/{id}")
     public ResponseEntity<AlbumSummaryDto> getAlbumById(@PathVariable String id) {

@@ -1,8 +1,7 @@
 package rs.raf.cadence.musicservice.services;
 
 import com.opencsv.bean.CsvToBeanBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import rs.raf.cadence.musicservice.data.entities.Album;
@@ -14,9 +13,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
+@Slf4j
 @Service
 public class DataImportService {
-    private static final Logger logger = LoggerFactory.getLogger(DataImportService.class);
     private final ArtistRepository artistRepository;
     private final AlbumRepository albumRepository;
 
@@ -27,26 +26,32 @@ public class DataImportService {
 
     public void importCsvData() {
         if (artistRepository.count() == 0) {
-            logger.info("Artist data not found, importing from CSV file...");
+            log.info("Artist data not found, importing from CSV file...");
             importArtists();
-        } else if (albumRepository.count() == 0) {
-            logger.info("Album data not found, importing from CSV file...");
+        } else {
+            log.info("Artist data already exists, skipping artist import");
+        }
+
+        if (albumRepository.count() == 0) {
+            log.info("Album data not found, importing from CSV file...");
             importAlbums();
         } else {
-            logger.info("Artist data already exists, skipping import");
+            log.info("Album data already exists, skipping album import");
         }
     }
 
     private void importArtists() {
         try {
-            logger.info("Loading artists from CSV file...");
-            List<Artist> artists = new CsvToBeanBuilder(new InputStreamReader(new ClassPathResource("data/artists.csv").getInputStream()))
+            log.info("Loading artists from CSV file...");
+            List<Artist> artists = new CsvToBeanBuilder<Artist>(new InputStreamReader(new ClassPathResource("data/artists.csv").getInputStream()))
                     .withType(Artist.class)
                     .withSkipLines(1)
                     .build()
                     .parse();
+            log.info("Parsed {} artists from CSV", artists.size());
+
             artistRepository.saveAll(artists);
-            logger.info("Finished loading artists.");
+            log.info("Finished loading artists.");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -54,14 +59,16 @@ public class DataImportService {
 
     private void importAlbums() {
         try {
-            logger.info("Loading albums from CSV file...");
-            List<Album> albums = new CsvToBeanBuilder(new InputStreamReader(new ClassPathResource("data/albums.csv").getInputStream()))
+            log.info("Loading albums from CSV file...");
+            List<Album> albums = new CsvToBeanBuilder<Album>(new InputStreamReader(new ClassPathResource("data/albums.csv").getInputStream()))
                     .withType(Album.class)
                     .withSkipLines(1)
                     .build()
                     .parse();
+            log.info("Parsed {} albums from CSV", albums.size());
+
             albumRepository.saveAll(albums);
-            logger.info("Finished loading albums.");
+            log.info("Finished loading albums.");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
