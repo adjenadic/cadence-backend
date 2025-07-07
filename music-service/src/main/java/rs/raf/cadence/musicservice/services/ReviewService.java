@@ -47,18 +47,17 @@ public class ReviewService {
         Review review;
         if (existingReview.isPresent()) {
             review = existingReview.get();
-            review.setContent(createReviewDto.getContent());
-            review.setRating(createReviewDto.getRating());
-            review.setTimestamp(System.currentTimeMillis());
             review.setEdited(true);
         } else {
-            review = new Review(
-                    createReviewDto.getAlbumId(),
-                    createReviewDto.getUserId(),
-                    createReviewDto.getContent(),
-                    createReviewDto.getRating()
-            );
+            review = new Review();
+            review.setAlbumId(createReviewDto.getAlbumId());
+            review.setUserId(createReviewDto.getUserId());
+            review.setEdited(false);
         }
+
+        review.setContent(createReviewDto.getContent());
+        review.setRating(createReviewDto.getRating());
+        review.setTimestamp(System.currentTimeMillis());
 
         review = reviewRepository.save(review);
         updateAlbumScore(createReviewDto.getAlbumId());

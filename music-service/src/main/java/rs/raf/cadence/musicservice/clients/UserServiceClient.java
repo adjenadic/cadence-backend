@@ -29,7 +29,7 @@ public class UserServiceClient {
             ResponseEntity<UserDetailsDto> response = restTemplate.getForEntity(url, UserDetailsDto.class);
             return response.getBody();
         } catch (Exception e) {
-            log.warn("Failed to fetch user details for userId: " + userId, e);
+            log.warn("Failed to fetch user details for userId: {}", userId, e);
             return createFallbackUserDetails(userId);
         }
     }

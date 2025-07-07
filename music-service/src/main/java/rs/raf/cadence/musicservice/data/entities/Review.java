@@ -22,11 +22,4 @@ public class Review {
     private Integer rating; // 1-10
     private Long timestamp;
     private boolean edited;
-
-    public Review(String id, Long userId, String content, Integer rating) {
-        this.id = id;
-        this.userId = userId;
-        this.content = content;
-        this.rating = rating;
-    }
 }
