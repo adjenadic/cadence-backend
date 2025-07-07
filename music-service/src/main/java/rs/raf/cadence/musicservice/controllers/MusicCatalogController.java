@@ -4,13 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import rs.raf.cadence.musicservice.data.dtos.AlbumSummaryDto;
-import rs.raf.cadence.musicservice.data.dtos.ArtistSummaryDto;
-import rs.raf.cadence.musicservice.data.dtos.SearchResultsDto;
+import rs.raf.cadence.musicservice.data.dtos.*;
 import rs.raf.cadence.musicservice.data.entities.Album;
 import rs.raf.cadence.musicservice.data.entities.Artist;
 import rs.raf.cadence.musicservice.mappers.MusicCatalogMapper;
 import rs.raf.cadence.musicservice.services.MusicCatalogService;
+import rs.raf.cadence.musicservice.services.ReviewService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,6 +22,7 @@ import java.util.stream.Collectors;
 public class MusicCatalogController {
     private final MusicCatalogService musicCatalogService;
     private final MusicCatalogMapper musicCatalogMapper;
+    private final ReviewService reviewService;
 
     @GetMapping("/search")
     public ResponseEntity<SearchResultsDto> search(@RequestParam String q) {
@@ -93,5 +93,29 @@ public class MusicCatalogController {
                 .map(musicCatalogMapper::artistToArtistSummaryDto)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(dtos);
+    }
+
+    @GetMapping("/albums/{id}/reviews")
+    public ResponseEntity<List<ReviewDto>> getAlbumReviews(@PathVariable String id) {
+        List<ReviewDto> reviews = reviewService.getReviewsByAlbum(id);
+        return ResponseEntity.ok(reviews);
+    }
+
+    @GetMapping("/users/{userId}/reviews")
+    public ResponseEntity<List<ReviewDto>> getUserReviews(@PathVariable Long userId) {
+        List<ReviewDto> reviews = reviewService.getReviewsByUser(userId);
+        return ResponseEntity.ok(reviews);
+    }
+
+    @PostMapping("/reviews")
+    public ResponseEntity<ReviewDto> createReview(@RequestBody CreateReviewDto createReviewDto) {
+        ReviewDto review = reviewService.createOrUpdateReview(createReviewDto);
+        return ResponseEntity.ok(review);
+    }
+
+    @DeleteMapping("/reviews/{reviewId}")
+    public ResponseEntity<Boolean> deleteReview(@PathVariable String reviewId, @RequestParam Long userId) {
+        boolean deleted = reviewService.deleteReview(reviewId, userId);
+        return ResponseEntity.ok(deleted);
     }
 }
