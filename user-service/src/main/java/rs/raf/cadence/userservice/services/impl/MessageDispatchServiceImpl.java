@@ -18,7 +18,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MessageDispatchServiceImpl implements MessageDispatchService {
     @Value("${app.frontend.url}")
-    public static String FRONTEND_URL;
+    private String frontendUrl;
     private final RabbitTemplate rabbitTemplate;
     private final TemplateEngine templateEngine;
     private final UserRepository userRepository;
@@ -30,7 +30,7 @@ public class MessageDispatchServiceImpl implements MessageDispatchService {
         message.put("subject", subject);
 
         Context context = new Context();
-        context.setVariable("logoUrl", FRONTEND_URL + "/assets/logo/cadence_light_full.png");
+        context.setVariable("logoUrl", frontendUrl + "/assets/logo/cadence_light_full.png");
         context.setVariable("username", user.getUsername());
 
         if (includeVerification) {
@@ -39,7 +39,7 @@ public class MessageDispatchServiceImpl implements MessageDispatchService {
             user.setVerificationTokenExpiry(System.currentTimeMillis() + (24 * 60 * 60 * 1000));
             userRepository.save(user);
 
-            String verificationUrl = FRONTEND_URL + "/verify-email?token=" + token;
+            String verificationUrl = frontendUrl + "/verify-email?token=" + token;
             context.setVariable("verificationUrl", verificationUrl);
         }
 
