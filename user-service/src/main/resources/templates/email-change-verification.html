@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <style>
         body {
@@ -65,7 +65,7 @@
 </head>
 <body>
 <div class="header">
-    <img th:src="${logoUrl}" alt="Cadence" style="height: 40px; margin-bottom: 10px;"/>
+    <img alt="Cadence" style="height: 40px; margin-bottom: 10px;" th:src="${logoUrl}"/>
     <p class="subtitle">Email Change Verification</p>
 </div>
 <div class="content">
@@ -74,7 +74,7 @@
         your account, please verify your new email address by clicking the button below:</p>
 
     <div style="text-align: center;">
-        <a th:href="${verificationUrl}" class="button">Verify New Email Address</a>
+        <a class="button" th:href="${verificationUrl}">Verify New Email Address</a>
     </div>
 
     <div class="warning">

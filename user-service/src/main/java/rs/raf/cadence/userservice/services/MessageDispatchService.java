@@ -6,6 +6,8 @@ import rs.raf.cadence.userservice.data.entities.User;
 @Service
 public interface MessageDispatchService {
     void sendAccountVerificationEmail(User user);
+
     void sendEmailChangeEmail(User user);
+
     void sendPasswordChangeEmail(User user);
 }

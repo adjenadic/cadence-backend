@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <style>
         body {
@@ -57,7 +57,7 @@
 </head>
 <body>
 <div class="header">
-    <img th:src="${logoUrl}" alt="Cadence" style="height: 40px; margin-bottom: 10px;"/>
+    <img alt="Cadence" style="height: 40px; margin-bottom: 10px;" th:src="${logoUrl}"/>
     <p class="subtitle">Email Verification</p>
 </div>
 <div class="content">
@@ -65,7 +65,7 @@
     <p>Thank you for registering with Cadence. To complete your account setup, please verify your email address by
         clicking the button below:</p>
     <div style="text-align: center;">
-        <a th:href="${verificationUrl}" class="button">Verify Email Address</a>
+        <a class="button" th:href="${verificationUrl}">Verify Email Address</a>
     </div>
     <p>This verification link will expire in 24 hours for security purposes.</p>
     <p>If you didn't create an account with Cadence, please ignore this email.</p>
