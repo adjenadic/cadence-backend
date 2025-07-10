@@ -17,11 +17,11 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class MessageDispatchServiceImpl implements MessageDispatchService {
-    @Value("${app.frontend.url}")
-    private String frontendUrl;
     private final RabbitTemplate rabbitTemplate;
     private final TemplateEngine templateEngine;
     private final UserRepository userRepository;
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
 
     private void sendEmail(User user, String subject, String templateName, String queueName, boolean includeVerification) {
         Map<String, Object> message = new HashMap<>();
