@@ -105,16 +105,13 @@ public class ReviewService {
             return Collections.emptyList();
         }
 
-        // Get unique user IDs
         List<Long> userIds = reviews.stream()
                 .map(Review::getUserId)
                 .distinct()
                 .collect(Collectors.toList());
 
-        // Batch fetch user details
         Map<Long, UserDetailsDto> userDetailsMap = userServiceClient.getUserDetailsBatch(userIds);
 
-        // Map reviews with user details
         return reviews.stream()
                 .map(review -> {
                     UserDetailsDto userDetails = userDetailsMap.get(review.getUserId());
