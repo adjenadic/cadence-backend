@@ -23,10 +23,14 @@ services:
     container_name: mongo
     ports:
       - '27017:27017'
+    environment:
+      - 'MONGO_INITDB_DATABASE=admin'
+      - 'MONGO_INITDB_ROOT_USERNAME=mongodb'
+      - 'MONGO_INITDB_ROOT_PASSWORD=secret'
     networks:
       - backend
     healthcheck:
-      test: [ "CMD-SHELL", "mongo --eval 'db.runCommand({ ping: 1 })'" ]
+      test: [ "CMD-SHELL", "mongosh --eval 'db.runCommand({ ping: 1 })'" ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -40,49 +44,57 @@ services:
       - "5672:5672"
     volumes:
       - "./rabbitdata:/var/lib/rabbitmq"
+    networks:
+      - backend
     healthcheck:
       test: [ "CMD", "rabbitmqctl", "status" ]
       interval: 5s
       timeout: 20s
       retries: 5
 
-#  user-service:
-#    build: ./user-service
-#    container_name: user-service
-#    ports:
-#      - '8000:8000'
-#    environment:
-#      - 'SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/cadence_db?currentSchema=user_service_schema'
-#      - 'SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop'
-#    depends_on:
-#      postgres:
-#        condition: service_healthy
-#    networks:
-#      - backend
-#
-#  notification-service:
-#    build: ./notification-service
-#    container_name: notification-service
-#    ports:
-#      - '8001:8001'
-#    depends_on:
-#      rabbitmq:
-#        condition: service_healthy
-#    networks:
-#      - backend
-#
-#  music-service:
-#    build: ./music-service
-#    container_name: music-service
-#    ports:
-#      - '8002:8002'
-#    environment:
-#      - 'SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/cadence_db'
-#    depends_on:
-#      mongo:
-#        condition: service_started
-#    networks:
-#      - backend
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    ports:
+      - '8000:8000'
+    environment:
+      - 'RABBITMQ_HOST=rabbitmq'
+      - 'POSTGRES_HOST=postgres'
+      - 'SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop'
+      - 'FRONTEND_URL=http://localhost:4200'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - backend
+
+  notification-service:
+    build: ./notification-service
+    container_name: notification-service
+    ports:
+      - '8001:8001'
+    environment:
+      - 'RABBITMQ_HOST=rabbitmq'
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - backend
+
+  music-service:
+    build: ./music-service
+    container_name: music-service
+    ports:
+      - '8002:8002'
+    environment:
+      - 'RABBITMQ_HOST=rabbitmq'
+      - 'MONGO_HOST=mongo'
+      - 'USER_SERVICE_URL=http://user-service:8000'
+    depends_on:
+      mongo:
+        condition: service_started
+    networks:
+      - backend
 
 networks:
   backend:
